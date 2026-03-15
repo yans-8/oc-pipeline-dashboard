@@ -85,14 +85,21 @@
 </head>
 <body style="background:#f1f5f9;color:#0f172a;">
 
-<header>
-  <h1>Yan & Sonam — Credit Card Dashboard</h1>
-  <p>Updated March 15, 2026 · Verified against Monarch transactions + Amex benefit screens</p>
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('perks', this)">Perks & Credits</div>
-    <div class="tab" onclick="switchTab('routing', this)">Spend Routing</div>
-    <div class="tab" onclick="switchTab('points', this)">Points Summary</div>
-    <div class="tab" onclick="switchTab('value', this)">Return on Spend</div>
+<header class="topbar">
+  <div class="topbar-left">
+    <img src="https://raw.githubusercontent.com/yans-8/oc-pipeline-dashboard/main/Operating%20Crew%20Logo.png" alt="Operating Crew" style="height:40px;width:auto;display:block;">
+  </div>
+  <div class="topbar-center">
+    <div>
+      <div class="topbar-title">Yan & Sonam — Credit Card Dashboard</div>
+      <div class="topbar-subtitle">Updated March 15, 2026 · Verified against Monarch transactions + Amex benefit screens</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('perks', this)">Perks & Credits</button>
+      <button class="tab-btn" onclick="switchTab('routing', this)">Spend Routing</button>
+      <button class="tab-btn" onclick="switchTab('points', this)">Points Summary</button>
+      <button class="tab-btn" onclick="switchTab('value', this)">Return on Spend</button>
+    </div>
   </div>
 </header>
 
@@ -176,7 +183,7 @@
 /* ─── Tab switching ─── */
 function switchTab(name, el) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   el.classList.add('active');
 }
