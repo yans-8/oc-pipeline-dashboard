@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,202 +7,75 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  /* ── Dark theme (default) ── */
-  :root, [data-theme="dark"] {
-    --bg:        #0f1117;
-    --bg2:       #1a1f2e;
-    --bg3:       #1e2433;
-    --border:    #252d3d;
-    --border2:   #3b4560;
-    --text:      #e2e8f0;
-    --text2:     #94a3b8;
-    --text3:     #64748b;
-    --text4:     #475569;
-    --heading:   #ffffff;
-    --label-fg:  #e2e8f0; /* chart data labels */
-    --warn-bg:   #2a1a1a;
-    --warn-bdr:  #7f1d1d;
-    --deadline-bg: #1a1212;
-    --deadline-bdr: #3a1a1a;
-    --topbar-bg: #0f1117;
-    --tab-active-bg: #1e2433;
-    --tab-active-color: #e2e8f0;
-    --tab-color: #64748b;
-    --tog-bg:    #1a1f2e;
-    --info-bg:   #1e2433;
-    --info-bdr:  #475569;
-    --goal-line: rgba(255,255,255,0.45);
-    --goal-label: rgba(255,255,255,0.55);
-    --ceil-line: rgba(148,163,184,0.7);
-    --ceil-label: rgba(148,163,184,0.85);
-    --shadow:    none;
-    --card-shadow: none;
-    --theme-icon: '☀';
-  }
-
-  /* ── Light theme ── */
-  [data-theme="light"] {
-    --bg:        #f1f5f9;
-    --bg2:       #ffffff;
-    --bg3:       #f8fafc;
-    --border:    #e2e8f0;
-    --border2:   #cbd5e1;
-    --text:      #1e293b;
-    --text2:     #475569;
-    --text3:     #64748b;
-    --text4:     #94a3b8;
-    --heading:   #0f172a;
-    --label-fg:  #1e293b;
-    --warn-bg:   #fff5f5;
-    --warn-bdr:  #fecaca;
-    --deadline-bg: #fff5f5;
-    --deadline-bdr: #fecaca;
-    --topbar-bg: #ffffff;
-    --tab-active-bg: #1c3a2a;
-    --tab-active-color: #ffffff;
-    --tab-color: #64748b;
-    --tog-bg:    #f1f5f9;
-    --info-bg:   #f8fafc;
-    --info-bdr:  #cbd5e1;
-    --goal-line: rgba(28,58,42,0.5);
-    --goal-label: rgba(28,58,42,0.7);
-    --ceil-line: rgba(100,116,139,0.6);
-    --ceil-label: rgba(100,116,139,0.8);
-    --shadow:    0 1px 3px rgba(0,0,0,0.08);
-    --card-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    --theme-icon: '🌙';
-  }
-
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
-  .topbar { background: var(--topbar-bg); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
-  .topbar-left { display: flex; align-items: center; gap: 14px; }
-  .topbar-title { font-size: 15px; font-weight: 700; color: var(--heading); }
-  .topbar .sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; }
+  .topbar { background: #0f1117; border-bottom: 1px solid #1e2433; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar h1 { font-size: 18px; font-weight: 700; color: #fff; }
+  .topbar .sub { font-size: 12px; color: #475569; margin-top: 2px; }
   .tabs { display: flex; gap: 4px; }
-  .tab-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--tab-color); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
-  .tab-btn.active { background: var(--tab-active-bg); color: var(--tab-active-color); border-color: var(--tab-active-bg); }
-  .tab-btn:hover:not(.active) { color: var(--text2); border-color: var(--border2); }
-
-  /* Theme toggle button */
-  .theme-toggle { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 14px; color: var(--text2); transition: all .15s; display: flex; align-items: center; gap: 5px; }
-  .theme-toggle:hover { border-color: var(--border2); }
-  .theme-toggle-label { font-size: 11px; font-weight: 600; }
-
+  .tab-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid #252d3d; background: transparent; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
+  .tab-btn.active { background: #1e2433; color: #e2e8f0; border-color: #3b4560; }
+  .tab-btn:hover:not(.active) { color: #94a3b8; border-color: #3b4560; }
   .page { display: none; padding: 24px; }
   .page.active { display: block; }
   .grid { display: grid; gap: 16px; }
   .col2 { grid-template-columns: 1fr 1fr; }
   .col4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
   .col3 { grid-template-columns: 1fr 1fr 1fr; }
-  .card { background: var(--bg2); border-radius: 12px; padding: 18px 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow); transition: background .2s, border-color .2s; }
-  .card-title { font-size: 11px; font-weight: 600; color: var(--text4); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
-  .stat-val { font-size: 26px; font-weight: 700; color: var(--heading); }
-  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .card { background: #1a1f2e; border-radius: 12px; padding: 18px 20px; border: 1px solid #252d3d; }
+  .card-title { font-size: 11px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .stat-val { font-size: 26px; font-weight: 700; color: #fff; }
+  .stat-sub { font-size: 11px; color: #64748b; margin-top: 4px; }
   .chart-wrap { position: relative; }
   .section { margin-bottom: 16px; }
-
   .deal-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .deal-table th { text-align: left; color: var(--text4); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
-  .deal-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .deal-table th { text-align: left; color: #475569; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #252d3d; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .deal-table td { padding: 7px 8px; border-bottom: 1px solid #1e2433; color: #cbd5e1; }
   .deal-table tr:last-child td { border-bottom: none; }
-  .deal-table tr:hover td { background: var(--bg3); }
-
+  .deal-table tr:hover td { background: #1e2433; }
   .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; }
-  [data-theme="dark"] .badge-3pl  { background: #1e3a5f; color: #60a5fa; }
-  [data-theme="dark"] .badge-pkg  { background: #2d1b4e; color: #c084fc; }
-  [data-theme="dark"] .badge-ship { background: #1a3a2a; color: #4ade80; }
-  [data-theme="dark"] .badge-cons { background: #3a2a1a; color: #fb923c; }
-  [data-theme="light"] .badge-3pl  { background: #dbeafe; color: #1d4ed8; }
-  [data-theme="light"] .badge-pkg  { background: #f3e8ff; color: #7c3aed; }
-  [data-theme="light"] .badge-ship { background: #dcfce7; color: #15803d; }
-  [data-theme="light"] .badge-cons { background: #ffedd5; color: #c2410c; }
-
-  .pct-bar { background: var(--border); border-radius: 4px; height: 5px; margin-top: 4px; }
+  .badge-3pl { background: #1e3a5f; color: #60a5fa; }
+  .badge-pkg { background: #2d1b4e; color: #c084fc; }
+  .badge-ship { background: #1a3a2a; color: #4ade80; }
+  .badge-cons { background: #3a2a1a; color: #fb923c; }
+  .pct-bar { background: #252d3d; border-radius: 4px; height: 5px; margin-top: 4px; }
   .pct-fill { height: 5px; border-radius: 4px; }
-
-  .insight { background: var(--bg3); border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 11px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; color: var(--text2); }
-  .insight strong { color: var(--text); }
+  .insight { background: #1e2433; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 11px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; color: #94a3b8; }
+  .insight strong { color: #e2e8f0; }
   .insight .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #3b82f6; font-weight: 700; margin-bottom: 3px; }
-
-  .green { color: #16a34a; }
-  [data-theme="dark"] .green { color: #4ade80; }
-  .yellow { color: #ca8a04; }
-  [data-theme="dark"] .yellow { color: #facc15; }
-  .red { color: #dc2626; }
-  [data-theme="dark"] .red { color: #f87171; }
-  .blue { color: #2563eb; }
-  [data-theme="dark"] .blue { color: #60a5fa; }
-  .amber { color: #d97706; }
-  [data-theme="dark"] .amber { color: #fbbf24; }
-
-  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-bdr); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
-  .info-box { background: var(--info-bg); border-left: 3px solid var(--info-bdr); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
-
+  .green { color: #4ade80; } .yellow { color: #facc15; } .red { color: #f87171; } .blue { color: #60a5fa; } .amber { color: #fbbf24; }
+  .warn-box { background: #2a1a1a; border: 1px solid #7f1d1d; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px; }
+  .info-box { background: #1e2433; border-left: 3px solid #475569; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px; }
+  /* Growth plan specific */
   .funnel-stage { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .funnel-bar-wrap { flex: 1; background: var(--bg3); border-radius: 6px; height: 36px; position: relative; overflow: hidden; }
+  .funnel-bar-wrap { flex: 1; background: #1e2433; border-radius: 6px; height: 36px; position: relative; overflow: hidden; }
   .funnel-bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; transition: width .4s; }
-  .funnel-meta { width: 160px; text-align: right; font-size: 11px; color: var(--text3); flex-shrink: 0; }
-  .funnel-label { width: 160px; font-size: 12px; font-weight: 600; color: var(--text2); flex-shrink: 0; }
-  .funnel-arrow { color: var(--text4); font-size: 14px; margin: -4px 0 -4px 172px; }
-
-  .channel-row { display: grid; grid-template-columns: 180px 80px 100px 90px 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .funnel-meta { width: 160px; text-align: right; font-size: 11px; color: #64748b; flex-shrink: 0; }
+  .funnel-label { width: 160px; font-size: 12px; font-weight: 600; color: #94a3b8; flex-shrink: 0; }
+  .funnel-arrow { color: #475569; font-size: 14px; margin: -4px 0 -4px 172px; }
+  .channel-row { display: grid; grid-template-columns: 180px 80px 100px 90px 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #1e2433; font-size: 12px; }
   .channel-row:last-child { border-bottom: none; }
-  .channel-row .ch-name { font-weight: 600; color: var(--text); }
+  .channel-row .ch-name { font-weight: 600; color: #e2e8f0; }
   .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
-  .dot-green { background: #16a34a; }
-  [data-theme="dark"] .dot-green { background: #4ade80; }
-  .dot-yellow { background: #ca8a04; }
-  [data-theme="dark"] .dot-yellow { background: #facc15; }
-  .dot-red { background: #dc2626; }
-  [data-theme="dark"] .dot-red { background: #f87171; }
-
-  .week-target { background: var(--bg3); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700; text-align: center; }
+  .dot-green { background: #4ade80; } .dot-yellow { background: #facc15; } .dot-red { background: #f87171; }
+  .week-target { background: #1e2433; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700; text-align: center; }
   .timeline-wrap { position: relative; margin: 20px 0 8px; }
   .toggle-row { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
-  .tog-btn { font-size: 10px; font-weight: 600; padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border2); background: var(--tog-bg); color: var(--text2); cursor: pointer; transition: all .15s; }
-  .tog-btn.active-actual   { border-color: #2563eb; background: #dbeafe; color: #1d4ed8; }
-  [data-theme="dark"] .tog-btn.active-actual { background: #1e3a5f; color: #60a5fa; }
-  .tog-btn.active-expected { border-color: #d97706; background: #fef3c7; color: #92400e; }
-  [data-theme="dark"] .tog-btn.active-expected { background: #3a2a00; color: #fbbf24; }
-  .tog-btn.active-full     { border-color: var(--border2); background: var(--bg3); color: var(--text2); }
-  [data-theme="dark"] .tog-btn.active-full { background: #252d3d; color: #cbd5e1; }
-
-  /* OC Logo SVG */
-  .oc-logo { height: 32px; width: auto; display: block; flex-shrink: 0; }
+  .tog-btn { font-size: 10px; font-weight: 600; padding: 5px 14px; border-radius: 6px; border: 1px solid #475569; background: #1a1f2e; color: #94a3b8; cursor: pointer; }
+  .tog-btn.active-actual { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
+  .tog-btn.active-expected { border-color: #f59e0b; background: #3a2a00; color: #fbbf24; }
+  .tog-btn.active-full { border-color: #475569; background: #252d3d; color: #cbd5e1; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-left">
-    <!-- Operating Crew Logo (inline SVG) -->
-    <svg class="oc-logo" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
-      <!-- Icon: black circle with chartreuse cutout -->
-      <circle cx="30" cy="30" r="28" fill="#0a0a0a"/>
-      <!-- Chartreuse rectangle (left bar) -->
-      <rect x="4" y="22" width="16" height="16" rx="1" fill="#d4f540"/>
-      <!-- Chartreuse arc / bottom half -->
-      <path d="M 8 38 A 22 22 0 0 0 52 38 Z" fill="#d4f540"/>
-      <!-- Dark circle cutout (inner) -->
-      <circle cx="30" cy="30" r="13" fill="#0a0a0a"/>
-      <!-- Text: Operating Crew -->
-      <text x="68" y="38" font-family="-apple-system, Georgia, serif" font-size="22" font-weight="700" fill="#1c3a2a" letter-spacing="-0.3">Operating Crew</text>
-    </svg>
-    <div>
-      <div class="topbar-title" style="display:none">Operating Crew — Pipeline Dashboard</div>
-      <div class="sub">Pipeline Dashboard · As of March 15, 2026</div>
-    </div>
+  <div>
+    <div class="topbar h1">Operating Crew — Pipeline Dashboard</div>
+    <div class="sub">As of March 15, 2026 · Based on Forecast tab</div>
   </div>
-  <div class="topbar-right">
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('info',event)">Info</button>
-      <button class="tab-btn" onclick="showTab('growth',event)">Growth Plan</button>
-    </div>
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
-      <span id="themeIcon">☀️</span><span class="theme-toggle-label" id="themeLabel">Light</span>
-    </button>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('info')">Info</button>
+    <button class="tab-btn" onclick="showTab('growth')">Growth Plan</button>
   </div>
 </div>
 
@@ -223,11 +96,11 @@
     </div>
     <div class="card">
       <div class="card-title">Full Pipeline (all deals close)</div>
-      <div class="stat-val" style="color:var(--text2)">$558K</div>
+      <div class="stat-val" style="color:#94a3b8">$558K</div>
       <div class="stat-sub">Best case · <span class="red">$692K still missing</span></div>
     </div>
-    <div class="card" id="deadlineCard" style="background:var(--deadline-bg);border-color:var(--deadline-bdr);">
-      <div class="card-title red">⚠ Effective Deadline</div>
+    <div class="card" style="background:#1a1212;border-color:#3a1a1a;">
+      <div class="card-title" style="color:#f87171;">⚠ Effective Deadline</div>
       <div class="stat-val red">Aug 31</div>
       <div class="stat-sub">Deals not closed by Aug 31 are 2027 revenue</div>
     </div>
@@ -237,7 +110,7 @@
   <div class="card section">
     <div class="card-title">Cumulative 2026 Revenue vs $1.25M Goal</div>
     <div class="info-box">
-      <strong style="color:var(--text);">Why $1.25M:</strong> The original $1M target assumed clean execution. 2025 bookings eroded ~27% (from ~$450K to $327K) due to deal slippage, losses, and margin cuts. Applying the same risk factor to the target means aiming at $1.25M to actually land at $1M. The gap to $1.25M is $692K from deals not yet in the funnel.
+      <strong style="color:#e2e8f0;">Why $1.25M:</strong> The original $1M target assumed clean execution. 2025 bookings eroded ~27% (from ~$450K to $327K) due to deal slippage, losses, and margin cuts. Applying the same risk factor to the target means aiming at $1.25M to actually land at $1M. The gap to $1.25M is $692K from deals not yet in the funnel.
     </div>
     <div class="chart-wrap" style="height:280px;"><canvas id="cumulativeChart"></canvas></div>
     <div class="toggle-row">
@@ -295,34 +168,19 @@
 <!-- ═══════════════════════════════════════════════════════ GROWTH PLAN TAB -->
 <div id="tab-growth" class="page">
 
-  <!-- This Week callout -->
-  <div class="card section" style="border-left:4px solid #1c3a2a;border-radius:0 12px 12px 0;background:var(--bg2);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);">📋 This Week — Week of Mar 16</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Minimum actions to stay on pace for $692K gap close by Aug 31</div>
-      </div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600;background:var(--bg3);padding:4px 10px;border-radius:6px;border:1px solid var(--border);">24 weeks left</div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;" id="thisWeekCards"></div>
-    <div style="margin-top:14px;padding:10px 14px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.6;">
-      <strong style="color:var(--text);">Top priority this week:</strong> Send StartOps audit invite to the first batch of 20 ICP members. Schedule 3PL partner check-ins — the close window is 7 weeks. Fire up LinkedIn DMs if not already started; every week of delay removes 35–50 touches from the funnel.
-    </div>
-  </div>
-
   <!-- Gap summary strip -->
   <div class="grid col3 section">
-    <div class="card" style="border-left:3px solid #dc2626;border-radius:0 12px 12px 0;">
+    <div class="card" style="border-left:3px solid #f87171;border-radius:0 12px 12px 0;">
       <div class="card-title red">Revenue Gap (Expected basis)</div>
       <div class="stat-val red">$818K</div>
       <div class="stat-sub">$432K expected vs $1.25M target</div>
     </div>
-    <div class="card" style="border-left:3px solid #d97706;border-radius:0 12px 12px 0;">
-      <div class="card-title" style="color:#d97706;">Gap Even If All Deals Close</div>
+    <div class="card" style="border-left:3px solid #f59e0b;border-radius:0 12px 12px 0;">
+      <div class="card-title" style="color:#f59e0b;">Gap Even If All Deals Close</div>
       <div class="stat-val amber">$692K</div>
       <div class="stat-sub">Must come from deals not yet in funnel</div>
     </div>
-    <div class="card" id="weeksCard" style="background:var(--deadline-bg);border-color:var(--deadline-bdr);">
+    <div class="card" style="background:#1a1212;border-color:#3a1a1a;">
       <div class="card-title red">Weeks to Aug 31</div>
       <div class="stat-val red">24 weeks</div>
       <div class="stat-sub">Target $1.25M to land at $1M after ~25% pipeline risk</div>
@@ -332,136 +190,107 @@
   <!-- Backward funnel -->
   <div class="card section">
     <div class="card-title">Backward Funnel — What It Takes to Close the Gap</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Starting from the $692K gap (risk-adjusted target of $1.25M minus $558K full pipeline ceiling), working backwards to required top-of-funnel volume. Based on avg deal value of $45K and realistic conversion rates.</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:16px;">Starting from the $692K gap (risk-adjusted target of $1.25M minus $558K full pipeline ceiling), working backwards to required top-of-funnel volume. Based on avg deal value of $45K and realistic conversion rates.</div>
     <div id="backwardFunnel"></div>
-    <div style="margin-top:16px;padding:12px 14px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7;">
-      <strong style="color:#dc2626;">The number that matters:</strong> To close $692K from deals not yet in the funnel, you need roughly <strong style="color:var(--text);">550–650 targeted outreach touches</strong> — assuming warm-ish leads (LinkedIn DMs to qualified DTC founders) at a 28% response rate, 60% call-book rate, and 40% close from proposal. Warm referrals close at 5–10× higher rates but can't reach this volume alone. The case for LinkedIn cold DMs starting immediately is decisive.
+    <div style="margin-top:16px;padding:12px 14px;background:#1e2433;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.7;">
+      <strong style="color:#f87171;">The number that matters:</strong> To close $692K from deals not yet in the funnel, you need roughly <strong style="color:#fff;">550–650 targeted outreach touches</strong> — assuming warm-ish leads (LinkedIn DMs to qualified DTC founders) at a 28% response rate, 60% call-book rate, and 40% close from proposal. Warm referrals close at 5–10× higher rates but can't reach this volume alone. The case for LinkedIn cold DMs starting immediately is decisive.
     </div>
   </div>
 
   <!-- Deadline timeline -->
   <div class="card section">
     <div class="card-title">Deal Type Close Windows — How Much Time Is Left</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:20px;">Last date to start a <em>first conversation</em> for revenue to land in 2026. Assumes typical close cycle per deal type.</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:20px;">Last date to start a <em>first conversation</em> for revenue to land in 2026. Assumes typical close cycle per deal type.</div>
     <div id="timelineViz"></div>
   </div>
 
   <!-- Channel breakdown -->
   <div class="card section">
-    <div class="card-title">Growth Channels — Revenue Model by Channel</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Each channel's realistic contribution toward the $692K gap, based on addressable volume, conversion rates, and avg deal size. Sorted by expected revenue impact.</div>
-    <div style="display:grid;grid-template-columns:180px 70px 70px 70px 70px 80px 80px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;">
-      <div>Channel</div><div>Status</div><div>TAM</div><div>Response</div><div>Close %</div><div>Est. Deals</div><div style="color:#16a34a;">Rev. Impact</div><div>Weekly Ask</div>
+    <div class="card-title">Growth Channels — Required vs Current Activity</div>
+    <div style="display:grid;grid-template-columns:180px 80px 100px 90px 80px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #252d3d;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;">
+      <div>Channel</div><div>Status</div><div>Est. Deals/Qtr</div><div>Close Rate</div><div>Weekly Ask</div><div>Notes</div>
     </div>
     <div id="channelTable"></div>
-    <div style="margin-top:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);display:flex;align-items:center;justify-content:space-between;">
-      <span>Total estimated revenue from new pipeline (all channels, optimistic)</span>
-      <span style="font-size:16px;font-weight:700;color:#16a34a;">~$635–780K</span>
-    </div>
   </div>
 
   <!-- Weekly pace -->
   <div class="card section">
     <div class="card-title">Weekly Activity Targets — What "On Pace" Looks Like</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">To close $692K in new deals by Aug 31 (risk-adjusted target), this is the minimum weekly activity across channels. Log actuals each week to know if you're in the game.</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:16px;">To close $692K in new deals by Aug 31 (risk-adjusted target), this is the minimum weekly activity across channels. Log actuals each week to know if you're in the game.</div>
     <div class="chart-wrap" style="height:220px;"><canvas id="paceChart"></canvas></div>
     <div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="paceCards"></div>
   </div>
 
   <!-- Aug deadline callout -->
-  <div class="card section" id="deadlineSection" style="background:var(--deadline-bg);border-color:var(--deadline-bdr);">
+  <div class="card section" style="background:#1a1212;border-color:#3a1a1a;">
     <div class="card-title red">Revenue by August 31 — Deadline View</div>
     <div class="grid col3" style="margin-bottom:14px;margin-top:4px;">
-      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px;">Actual by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;color:#2563eb;">$227K</div>
-        <div style="font-size:11px;color:var(--text3);">100% closed deals · locked in</div>
-        <div style="background:var(--border);border-radius:4px;height:6px;margin-top:8px;"><div style="width:23%;height:6px;border-radius:4px;background:#2563eb;"></div></div>
+      <div style="background:#1e2433;border-radius:8px;padding:12px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Actual by Aug 31</div>
+        <div style="font-size:22px;font-weight:700;color:#60a5fa;">$227K</div>
+        <div style="font-size:11px;color:#64748b;">100% closed deals · locked in</div>
+        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:23%;height:6px;border-radius:4px;background:#2563eb;"></div></div>
       </div>
-      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px;">Expected by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;color:#d97706;">$278K</div>
-        <div style="font-size:11px;color:var(--text3);">Probability-weighted · 22% of $1.25M</div>
-        <div style="background:var(--border);border-radius:4px;height:6px;margin-top:8px;"><div style="width:22%;height:6px;border-radius:4px;background:#d97706;"></div></div>
+      <div style="background:#1e2433;border-radius:8px;padding:12px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Expected by Aug 31</div>
+        <div style="font-size:22px;font-weight:700;color:#fbbf24;">$278K</div>
+        <div style="font-size:11px;color:#64748b;">Probability-weighted · 22% of $1.25M</div>
+        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:22%;height:6px;border-radius:4px;background:#f59e0b;"></div></div>
       </div>
-      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px;">Full Pipeline by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;" class="red">$318K</div>
-        <div style="font-size:11px;color:var(--text3);">Best case · 25% of $1.25M goal</div>
-        <div style="background:var(--border);border-radius:4px;height:6px;margin-top:8px;"><div style="width:25%;height:6px;border-radius:4px;background:#dc2626;"></div></div>
+      <div style="background:#1e2433;border-radius:8px;padding:12px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Full Pipeline by Aug 31</div>
+        <div style="font-size:22px;font-weight:700;color:#f87171;">$318K</div>
+        <div style="font-size:11px;color:#64748b;">Best case · 25% of $1.25M goal</div>
+        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:25%;height:6px;border-radius:4px;background:#f87171;"></div></div>
       </div>
     </div>
-    <div style="background:var(--warn-bg);border-left:3px solid #dc2626;border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.7;">
-      <strong class="red">The gap cannot be closed by converting existing pipeline.</strong> Even in the best case (all current deals close), only $318K lands by Aug 31 — against a ~$850K need to reach $1.25M by year-end. The remaining ~$530K must come from deals not yet in the funnel, found and closed in the next 60–90 days. <strong style="color:var(--text);">Won-Active deals continue paying out through year-end regardless — this deadline applies only to new closes.</strong>
+    <div style="background:#2a1a1a;border-left:3px solid #f87171;border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;color:#94a3b8;line-height:1.7;">
+      <strong style="color:#f87171;">The gap cannot be closed by converting existing pipeline.</strong> Even in the best case (all current deals close), only $318K lands by Aug 31 — against a ~$850K need to reach $1.25M by year-end. The remaining ~$530K must come from deals not yet in the funnel, found and closed in the next 60–90 days. <strong style="color:#e2e8f0;">Won-Active deals continue paying out through year-end regardless — this deadline applies only to new closes.</strong>
     </div>
   </div>
 
 </div><!-- end growth tab -->
 
 <script>
-// ── Theme ─────────────────────────────────────────────────────────
-let isDark = true;
-function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
-  document.getElementById('themeLabel').textContent = isDark ? 'Light' : 'Dark';
-  // Update OC logo text color
-  document.querySelector('.oc-logo text').setAttribute('fill', isDark ? '#d4f540' : '#1c3a2a');
-  // Rebuild charts with new colors
-  rebuildCharts();
-}
-
 // ── Tab switching ─────────────────────────────────────────────────
-function showTab(tab, ev) {
+function showTab(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  if (ev) ev.target.classList.add('active');
+  event.target.classList.add('active');
 }
 
 // ── Data ─────────────────────────────────────────────────────────
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+// Three-tier cumulative (from Excel)
 const actualCum   = [35223,  66889,  92555,  119471, 146387, 173303, 200219, 227052, 253885, 278801, 302654, 326506];
 const expectedCum = [35223,  66889,  92555,  127519, 162507, 200422, 239230, 278475, 318909, 357425, 394878, 432340];
 const fullCum     = [35223,  66889,  92555,  128871, 165437, 210191, 261853, 317985, 380035, 440167, 499237, 558390];
 const expectedIncr = expectedCum.map((v,i) => Math.max(0, v - actualCum[i]));
 const fullIncr     = fullCum.map((v,i) => Math.max(0, v - expectedCum[i]));
 
+// Monthly revenue (full pipeline) and expenses
 const revenueMonthly = [35223, 31666, 25666, 36316, 36316, 44254, 44545, 50166, 54124, 52208, 51144, 51228];
 const expenseMonthly = [28875, 29875, 35275, 36185, 39689, 36394, 37567, 37678, 38826, 37778, 37752, 42754];
-const wonData  = [32723, 23499, 17499, 18749, 18749, 18749, 18749, 18666, 18666, 18416, 17353, 17353];
+const wonData =  [32723, 23499, 17499, 18749, 18749, 18749, 18749, 18666, 18666, 18416, 17353, 17353];
 const implData = [2500,  8167,  8167,  13317, 13317, 16667, 16667, 17917, 19542, 17875, 17875, 17875];
 const progData = [0,     0,     0,     4250,  4250,  8838,  9129,  13583, 15917, 15917, 15917, 16000];
 
+const deadlineIdx = 7;
 let cumView = 'actual';
-let cumChart, monthlyChart, typeChart, funnelChart, paceChart;
 
-// ── Scale helpers ─────────────────────────────────────────────────
-function getScaleColors() {
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  return {
-    grid:  dark ? '#1e2433' : '#e2e8f0',
-    ticks: dark ? '#64748b' : '#94a3b8',
-    legend: dark ? '#94a3b8' : '#64748b',
-    label: dark ? '#e2e8f0' : '#1e293b',
-  };
-}
-function makeScales() {
-  const c = getScaleColors();
-  return {
-    x: { grid: { color: c.grid }, ticks: { color: c.ticks, font: { size: 11 } } },
-    y: { grid: { color: c.grid }, ticks: { color: c.ticks, font: { size: 11 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
-  };
-}
+// ── Chart defaults ────────────────────────────────────────────────
+const darkScales = {
+  x: { grid: { color: '#1e2433' }, ticks: { color: '#64748b', font: { size: 11 } } },
+  y: { grid: { color: '#1e2433' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
+};
 
 // ── Register overlay plugin ───────────────────────────────────────
 Chart.register({
   id: 'overlayLines',
   afterDraw(chart) {
     if (chart.canvas.id !== 'cumulativeChart') return;
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     const ctx = chart.ctx;
     const xScale = chart.scales.x;
     const yScale = chart.scales.y;
@@ -470,27 +299,21 @@ Chart.register({
 
     // $1.25M goal line
     const goalY = yScale.getPixelForValue(1250000);
-    ctx.strokeStyle = dark ? 'rgba(255,255,255,0.45)' : 'rgba(28,58,42,0.5)';
-    ctx.lineWidth = 1.5; ctx.setLineDash([7,4]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5; ctx.setLineDash([7,4]);
     ctx.beginPath(); ctx.moveTo(left, goalY); ctx.lineTo(right - 32, goalY); ctx.stroke();
-    ctx.fillStyle = dark ? 'rgba(255,255,255,0.55)' : 'rgba(28,58,42,0.7)';
-    ctx.font = 'bold 10px -apple-system,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = 'bold 10px -apple-system,sans-serif';
     ctx.fillText('$1.25M target', left + 6, goalY - 5);
 
     // Pipeline ceiling line
     const ceilY = yScale.getPixelForValue(558390);
-    ctx.strokeStyle = dark ? 'rgba(148,163,184,0.7)' : 'rgba(100,116,139,0.6)';
-    ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+    ctx.strokeStyle = 'rgba(148,163,184,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
     ctx.beginPath(); ctx.moveTo(left, ceilY); ctx.lineTo(right - 32, ceilY); ctx.stroke();
-    ctx.fillStyle = dark ? 'rgba(148,163,184,0.85)' : 'rgba(100,116,139,0.8)';
-    ctx.font = 'bold 10px -apple-system,sans-serif';
+    ctx.fillStyle = 'rgba(148,163,184,0.85)'; ctx.font = 'bold 10px -apple-system,sans-serif';
     ctx.fillText('Pipeline ceiling $558K', left + 6, ceilY - 5);
 
     // Gap bracket
     const bx = right - 14, ah = 6;
-    ctx.strokeStyle = dark ? '#f87171' : '#dc2626';
-    ctx.fillStyle   = dark ? '#f87171' : '#dc2626';
-    ctx.lineWidth = 1.5; ctx.setLineDash([]);
+    ctx.strokeStyle = '#f87171'; ctx.fillStyle = '#f87171'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
     ctx.beginPath(); ctx.moveTo(bx, ceilY); ctx.lineTo(bx, goalY); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bx-5,ceilY); ctx.lineTo(bx+5,ceilY); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bx-5,goalY); ctx.lineTo(bx+5,goalY); ctx.stroke();
@@ -502,11 +325,9 @@ Chart.register({
 
     // Aug 31 deadline
     const deadlineX = (xScale.getPixelForValue(7) + xScale.getPixelForValue(8)) / 2;
-    ctx.strokeStyle = dark ? '#f87171' : '#dc2626';
-    ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+    ctx.strokeStyle = '#f87171'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
     ctx.beginPath(); ctx.moveTo(deadlineX, yScale.top); ctx.lineTo(deadlineX, yScale.bottom); ctx.stroke();
-    ctx.fillStyle = dark ? '#f87171' : '#dc2626';
-    ctx.font = 'bold 10px -apple-system,sans-serif';
+    ctx.fillStyle = '#f87171'; ctx.font = 'bold 10px -apple-system,sans-serif';
     ctx.fillText('Aug 31 deadline', deadlineX + 5, yScale.top + 14);
     ctx.restore();
   }
@@ -517,15 +338,13 @@ Chart.register({
   id: 'cumLabels',
   afterDatasetsDraw(chart) {
     if (chart.canvas.id !== 'cumulativeChart') return;
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     const ctx = chart.ctx;
     const src = cumView === 'actual' ? actualCum : cumView === 'expected' ? expectedCum : fullCum;
     chart.getDatasetMeta(0).data.forEach((bar, i) => {
       const val = src[i];
       const y = chart.scales.y.getPixelForValue(val);
       ctx.save();
-      ctx.fillStyle = dark ? '#e2e8f0' : '#1e293b';
-      ctx.font = 'bold 9px -apple-system,sans-serif';
+      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('$' + (val/1000).toFixed(0) + 'K', bar.x, y - 5);
       ctx.restore();
@@ -533,187 +352,34 @@ Chart.register({
   }
 });
 
-// ── Build / rebuild all charts ────────────────────────────────────
-function buildCharts() {
-  const sc = makeScales();
-  const c = getScaleColors();
-
-  // Cumulative chart
-  cumChart = new Chart(document.getElementById('cumulativeChart'), {
-    type: 'bar',
-    data: {
-      labels: months,
-      datasets: [
-        { label: 'Actual (100% closed)',    data: actualCum,   backgroundColor: 'rgba(37,99,235,0.85)', borderColor: '#2563eb', borderWidth: 1, stack: 'r', order: 2 },
-        { label: 'Expected (prob-weighted)',data: expectedIncr, backgroundColor: 'rgba(217,119,6,0.65)', borderColor: '#d97706', borderWidth: 1, stack: 'r', order: 2 },
-        { label: 'Full pipeline',           data: fullIncr,    backgroundColor: 'rgba(148,163,184,0.25)', borderColor: 'rgba(148,163,184,0.4)', borderWidth: 1, stack: 'r', order: 2 },
-      ]
+// ── Cumulative chart ──────────────────────────────────────────────
+const cumChart = new Chart(document.getElementById('cumulativeChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      { label: 'Actual (100% closed)', data: actualCum, backgroundColor: 'rgba(37,99,235,0.85)', borderColor: '#2563eb', borderWidth: 1, stack: 'r', order: 2 },
+      { label: 'Expected (prob-weighted)', data: expectedIncr, backgroundColor: 'rgba(251,191,36,0.7)', borderColor: '#f59e0b', borderWidth: 1, stack: 'r', order: 2 },
+      { label: 'Full pipeline', data: fullIncr, backgroundColor: 'rgba(148,163,184,0.25)', borderColor: 'rgba(148,163,184,0.4)', borderWidth: 1, stack: 'r', order: 2 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: ctx => {
+        const i = ctx.dataIndex;
+        if (ctx.datasetIndex === 0) return ` Actual: $${(actualCum[i]/1000).toFixed(0)}K`;
+        if (ctx.datasetIndex === 1) return ` Expected total: $${(expectedCum[i]/1000).toFixed(0)}K`;
+        return ` Full pipeline total: $${(fullCum[i]/1000).toFixed(0)}K`;
+      }}}
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: c.legend, font: { size: 11 }, boxWidth: 12 } },
-        tooltip: { callbacks: { label: ctx => {
-          const i = ctx.dataIndex;
-          if (ctx.datasetIndex === 0) return ` Actual: $${(actualCum[i]/1000).toFixed(0)}K`;
-          if (ctx.datasetIndex === 1) return ` Expected total: $${(expectedCum[i]/1000).toFixed(0)}K`;
-          return ` Full pipeline total: $${(fullCum[i]/1000).toFixed(0)}K`;
-        }}}
-      },
-      scales: {
-        x: { ...sc.x, stacked: true },
-        y: { ...sc.y, stacked: true, max: 1400000 }
-      }
+    scales: {
+      x: { ...darkScales.x, stacked: true },
+      y: { ...darkScales.y, stacked: true, max: 1400000 }
     }
-  });
-
-  // Monthly chart
-  monthlyChart = new Chart(document.getElementById('monthlyChart'), {
-    type: 'bar',
-    data: {
-      labels: months,
-      datasets: [
-        { label: '4/Won-Active',   data: wonData,  backgroundColor: '#2563eb', stack: 'rev', order: 2 },
-        { label: '3/Implementation', data: implData, backgroundColor: '#7c3aed', stack: 'rev', order: 2 },
-        { label: '2/In Progress',  data: progData, backgroundColor: '#0891b2', stack: 'rev', order: 2 },
-        { label: 'Total Expenses', data: expenseMonthly, type: 'line', borderColor: '#dc2626', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4,2], pointRadius: 3, pointBackgroundColor: '#dc2626', fill: false, order: 1 },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: c.legend, font: { size: 11 }, boxWidth: 12 } } },
-      scales: {
-        x: { ...sc.x, stacked: true },
-        y: { ...sc.y, stacked: false }
-      }
-    },
-    plugins: [{
-      id: 'monthlyLabels',
-      afterDatasetsDraw(chart) {
-        const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const ctx = chart.ctx;
-        chart.getDatasetMeta(2).data.forEach((bar, i) => {
-          const total = wonData[i] + implData[i] + progData[i];
-          if (!total) return;
-          ctx.save(); ctx.fillStyle = dark ? '#e2e8f0' : '#1e293b';
-          ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
-          ctx.fillText('$' + (total/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
-        });
-      }
-    }]
-  });
-
-  // Deal type doughnut
-  typeChart = new Chart(document.getElementById('typeChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['🏭 3PL', '🚚 Shipping', '📦 Packaging', '💳 Consulting'],
-      datasets: [{ data: [969700, 892000, 418292, 130113], backgroundColor: ['#2563eb','#059669','#7c3aed','#d97706'], borderWidth: 0, hoverOffset: 8 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { color: c.legend, font: { size: 11 }, boxWidth: 12 } },
-        tooltip: { callbacks: { label: ctx => ' $' + (ctx.raw/1000).toFixed(0) + 'K (' + Math.round(ctx.raw/2410105*100) + '%)' } }
-      },
-      cutout: '65%'
-    },
-    plugins: [{
-      id: 'doughnutLabels',
-      afterDatasetsDraw(chart) {
-        const ctx = chart.ctx;
-        const total = 2410105;
-        chart.getDatasetMeta(0).data.forEach((arc, i) => {
-          const val = chart.data.datasets[0].data[i];
-          if (val / total < 0.04) return;
-          const angle = (arc.startAngle + arc.endAngle) / 2;
-          const r = (arc.outerRadius + arc.innerRadius) / 2;
-          ctx.save(); ctx.fillStyle = '#fff'; ctx.font = 'bold 10px -apple-system,sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('$' + (val/1000).toFixed(0) + 'K', arc.x + Math.cos(angle)*r, arc.y + Math.sin(angle)*r);
-          ctx.restore();
-        });
-      }
-    }]
-  });
-
-  // Funnel chart
-  funnelChart = new Chart(document.getElementById('funnelChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Won-Active', 'Implement.', 'In Progress', 'Interested'],
-      datasets: [
-        { label: 'Gross $',    data: [292105, 360000, 893000, 844000], backgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e3a5f' : '#bfdbfe', maxBarThickness: 32 },
-        { label: 'Expected $', data: [292105, 240800, 209000, 93300],  backgroundColor: '#2563eb', maxBarThickness: 32 },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 18 } },
-      plugins: { legend: { labels: { color: c.legend, font: { size: 11 }, boxWidth: 12 } } },
-      scales: {
-        x: { ...sc.x, ticks: { ...sc.x.ticks, font: { size: 10 } } },
-        y: { ...sc.y }
-      }
-    },
-    plugins: [{
-      id: 'funnelLabels',
-      afterDatasetsDraw(chart) {
-        const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const ctx = chart.ctx;
-        chart.data.datasets.forEach((ds, di) => {
-          chart.getDatasetMeta(di).data.forEach((bar, i) => {
-            if (!ds.data[i]) return;
-            ctx.save(); ctx.fillStyle = dark ? '#e2e8f0' : '#1e293b';
-            ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText('$' + (ds.data[i]/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
-          });
-        });
-      }
-    }]
-  });
-
-  // Pace chart
-  const paceWeeks = ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'];
-  const paceTargets = {
-    'LinkedIn DMs':     [35, 35, 40, 40, 45, 45, 50, 50],
-    'Partner Meetings': [1,  1,  1,  1,  1,  1,  1,  1 ],
-    'Referral Asks':    [2,  2,  2,  2,  2,  2,  2,  2 ],
-    'Intro Calls':      [2,  2,  3,  3,  3,  4,  4,  4 ],
-  };
-  paceChart = new Chart(document.getElementById('paceChart'), {
-    type: 'bar',
-    data: {
-      labels: paceWeeks,
-      datasets: [
-        { label: 'LinkedIn DMs (target)',  data: paceTargets['LinkedIn DMs'], backgroundColor: 'rgba(37,99,235,0.6)', stack: 'a' },
-        { label: 'Partner Meetings ×10',  data: paceTargets['Partner Meetings'].map(v=>v*10), backgroundColor: 'rgba(5,150,105,0.6)', stack: 'a' },
-        { label: 'Referral Asks ×10',     data: paceTargets['Referral Asks'].map(v=>v*10),    backgroundColor: 'rgba(124,58,237,0.6)', stack: 'a' },
-        { label: 'Intro Calls ×5',        data: paceTargets['Intro Calls'].map(v=>v*5),       backgroundColor: 'rgba(217,119,6,0.6)', stack: 'a' },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: c.legend, font: { size: 11 }, boxWidth: 12 } },
-        tooltip: { callbacks: { label: ctx => {
-          const labels = ['LinkedIn DMs','Partner Meetings','Referral Asks','Intro Calls'];
-          const actuals = [paceTargets['LinkedIn DMs'], paceTargets['Partner Meetings'], paceTargets['Referral Asks'], paceTargets['Intro Calls']];
-          return ` ${labels[ctx.datasetIndex]}: ${actuals[ctx.datasetIndex][ctx.dataIndex]}`;
-        }}}
-      },
-      scales: {
-        x: { ...sc.x, stacked: true },
-        y: { ...sc.y, stacked: true, ticks: { color: c.ticks, font: { size: 11 } } }
-      }
-    }
-  });
-}
-
-function rebuildCharts() {
-  [cumChart, monthlyChart, typeChart, funnelChart, paceChart].forEach(c => { if (c) c.destroy(); });
-  buildCharts();
-}
+  }
+});
 
 function setCumView(view) {
   cumView = view;
@@ -722,214 +388,283 @@ function setCumView(view) {
   cumChart.update();
 }
 
+// ── Monthly revenue + expenses chart ─────────────────────────────
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      { label: '4/Won-Active', data: wonData, backgroundColor: '#2563eb', stack: 'rev', order: 2 },
+      { label: '3/Implementation', data: implData, backgroundColor: '#7c3aed', stack: 'rev', order: 2 },
+      { label: '2/In Progress', data: progData, backgroundColor: '#0891b2', stack: 'rev', order: 2 },
+      { label: 'Total Expenses', data: expenseMonthly, type: 'line', borderColor: '#f87171', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4,2], pointRadius: 3, pointBackgroundColor: '#f87171', fill: false, order: 1 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } } },
+    scales: {
+      x: { ...darkScales.x, stacked: true },
+      y: { ...darkScales.y, stacked: false }
+    }
+  },
+  plugins: [{
+    id: 'monthlyLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      chart.getDatasetMeta(2).data.forEach((bar, i) => {
+        const total = wonData[i] + implData[i] + progData[i];
+        if (!total) return;
+        ctx.save(); ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('$' + (total/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
+      });
+    }
+  }]
+});
+
+// ── Deal type doughnut ────────────────────────────────────────────
+new Chart(document.getElementById('typeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['🏭 3PL', '🚚 Shipping', '📦 Packaging', '💳 Consulting'],
+    datasets: [{ data: [969700, 892000, 418292, 130113], backgroundColor: ['#2563eb','#059669','#7c3aed','#d97706'], borderWidth: 0, hoverOffset: 8 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: ctx => ' $' + (ctx.raw/1000).toFixed(0) + 'K (' + Math.round(ctx.raw/2410105*100) + '%)' } }
+    },
+    cutout: '65%'
+  },
+  plugins: [{
+    id: 'doughnutLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      const total = 2410105;
+      chart.getDatasetMeta(0).data.forEach((arc, i) => {
+        const val = chart.data.datasets[0].data[i];
+        if (val / total < 0.04) return;
+        const angle = (arc.startAngle + arc.endAngle) / 2;
+        const r = (arc.outerRadius + arc.innerRadius) / 2;
+        ctx.save(); ctx.fillStyle = '#fff'; ctx.font = 'bold 10px -apple-system,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('$' + (val/1000).toFixed(0) + 'K', arc.x + Math.cos(angle)*r, arc.y + Math.sin(angle)*r);
+        ctx.restore();
+      });
+    }
+  }]
+});
+
+// ── Funnel chart ──────────────────────────────────────────────────
+new Chart(document.getElementById('funnelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Won-Active', 'Implement.', 'In Progress', 'Interested'],
+    datasets: [
+      { label: 'Gross $', data: [292105, 360000, 893000, 844000], backgroundColor: '#1e3a5f', maxBarThickness: 32 },
+      { label: 'Expected $', data: [292105, 240800, 209000, 93300], backgroundColor: '#2563eb', maxBarThickness: 32 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    layout: { padding: { top: 18 } },
+    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } } },
+    scales: {
+      x: { ...darkScales.x, ticks: { ...darkScales.x.ticks, font: { size: 10 } } },
+      y: { ...darkScales.y }
+    }
+  },
+  plugins: [{
+    id: 'funnelLabels',
+    afterDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      chart.data.datasets.forEach((ds, di) => {
+        chart.getDatasetMeta(di).data.forEach((bar, i) => {
+          if (!ds.data[i]) return;
+          ctx.save(); ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText('$' + (ds.data[i]/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
+        });
+      });
+    }
+  }]
+});
+
 // ── Deal table ────────────────────────────────────────────────────
 const deals = [
-  { name: 'HULKEN - DTC',         type: '3pl',  stage: 'Implementation', deal: 130000, pct: 60, close: '2026-06' },
-  { name: 'Shameless Snacks',      type: '3pl',  stage: 'In Progress',    deal: 160000, pct: 20, close: '2026-08' },
-  { name: 'Venus et Fleur',        type: 'ship', stage: 'In Progress',    deal: 150000, pct: 15, close: '2026-05' },
-  { name: 'Tracksmith',            type: '3pl',  stage: 'Implementation', deal: 65000,  pct: 30, close: '2026-09' },
-  { name: 'Cradlewise Consulting', type: 'cons', stage: 'Implementation', deal: 60000,  pct: 100,close: '2026-02' },
-  { name: 'Alex Duong - Packaging',type: 'pkg',  stage: 'In Progress',    deal: 60000,  pct: 25, close: '2026-08' },
-  { name: 'Smalls Packaging',      type: 'pkg',  stage: 'In Progress',    deal: 60000,  pct: 5,  close: '2026-09' },
-  { name: 'Flaus 3PL',             type: '3pl',  stage: 'In Progress',    deal: 55000,  pct: 75, close: '2026-08' },
-  { name: 'BugMD',                 type: '3pl',  stage: 'In Progress',    deal: 80000,  pct: 20, close: '2026-09' },
-  { name: 'Green Compass',         type: 'ship', stage: 'In Progress',    deal: 80000,  pct: 10, close: '2026-08' },
-  { name: 'Equip Packaging',       type: 'pkg',  stage: 'Implementation', deal: 30000,  pct: 80, close: '2026-04' },
-  { name: 'Pila Energy',           type: 'ship', stage: 'Implementation', deal: 30000,  pct: 50, close: '2026-08' },
-  { name: 'The Only Bean',         type: '3pl',  stage: 'In Progress',    deal: 30000,  pct: 30, close: '2026-09' },
-  { name: 'Martie Packaging',      type: 'pkg',  stage: 'In Progress',    deal: 20000,  pct: 70, close: '2026-06' },
-  { name: 'Martie Consulting',     type: 'cons', stage: 'In Progress',    deal: 20000,  pct: 85, close: '2026-04' },
-  { name: 'Foggy Dog',             type: 'cons', stage: 'Implementation', deal: 7000,   pct: 90, close: '2026-04' },
-  { name: 'Create 3PL',            type: '3pl',  stage: 'In Progress',    deal: 8000,   pct: 90, close: '2026-06' },
-  { name: 'Tracksmith Packaging',  type: 'pkg',  stage: 'In Progress',    deal: 5000,   pct: 60, close: '2026-08' },
+  { name: 'HULKEN - DTC', type: '3pl', stage: 'Implementation', deal: 130000, pct: 60, close: '2026-06' },
+  { name: 'Shameless Snacks', type: '3pl', stage: 'In Progress', deal: 160000, pct: 20, close: '2026-08' },
+  { name: 'Venus et Fleur', type: 'ship', stage: 'In Progress', deal: 150000, pct: 15, close: '2026-05' },
+  { name: 'Tracksmith', type: '3pl', stage: 'Implementation', deal: 65000, pct: 30, close: '2026-09' },
+  { name: 'Cradlewise Consulting', type: 'cons', stage: 'Implementation', deal: 60000, pct: 100, close: '2026-02' },
+  { name: 'Alex Duong - Packaging', type: 'pkg', stage: 'In Progress', deal: 60000, pct: 25, close: '2026-08' },
+  { name: 'Smalls Packaging', type: 'pkg', stage: 'In Progress', deal: 60000, pct: 5, close: '2026-09' },
+  { name: 'Flaus 3PL', type: '3pl', stage: 'In Progress', deal: 55000, pct: 75, close: '2026-08' },
+  { name: 'BugMD', type: '3pl', stage: 'In Progress', deal: 80000, pct: 20, close: '2026-09' },
+  { name: 'Green Compass', type: 'ship', stage: 'In Progress', deal: 80000, pct: 10, close: '2026-08' },
+  { name: 'Equip Packaging', type: 'pkg', stage: 'Implementation', deal: 30000, pct: 80, close: '2026-04' },
+  { name: 'Pila Energy', type: 'ship', stage: 'Implementation', deal: 30000, pct: 50, close: '2026-08' },
+  { name: 'The Only Bean', type: '3pl', stage: 'In Progress', deal: 30000, pct: 30, close: '2026-09' },
+  { name: 'Martie Packaging', type: 'pkg', stage: 'In Progress', deal: 20000, pct: 70, close: '2026-06' },
+  { name: 'Martie Consulting', type: 'cons', stage: 'In Progress', deal: 20000, pct: 85, close: '2026-04' },
+  { name: 'Foggy Dog', type: 'cons', stage: 'Implementation', deal: 7000, pct: 90, close: '2026-04' },
+  { name: 'Create 3PL', type: '3pl', stage: 'In Progress', deal: 8000, pct: 90, close: '2026-06' },
+  { name: 'Tracksmith Packaging', type: 'pkg', stage: 'In Progress', deal: 5000, pct: 60, close: '2026-08' },
 ];
 deals.sort((a,b) => b.deal - a.deal);
 const typeBadge = { '3pl':'badge-3pl','ship':'badge-ship','pkg':'badge-pkg','cons':'badge-cons' };
 const typeLabel = { '3pl':'🏭 3PL','ship':'🚚 Shipping','pkg':'📦 Packaging','cons':'💳 Consulting' };
-const pctColor = p => p >= 75 ? '#16a34a' : p >= 50 ? '#ca8a04' : p >= 25 ? '#ea580c' : '#dc2626';
+const pctColor = p => p >= 75 ? '#4ade80' : p >= 50 ? '#facc15' : p >= 25 ? '#fb923c' : '#f87171';
 const tbody = document.getElementById('dealTableBody');
 deals.forEach(d => {
   const exp = Math.round(d.deal * d.pct / 100);
   tbody.innerHTML += `<tr>
     <td>${d.name}</td>
     <td><span class="badge ${typeBadge[d.type]}">${typeLabel[d.type]}</span></td>
-    <td style="color:var(--text3)">${d.stage}</td>
-    <td style="color:var(--text);font-weight:600">$${(d.deal/1000).toFixed(0)}K</td>
+    <td style="color:#64748b">${d.stage}</td>
+    <td style="color:#fff;font-weight:600">$${(d.deal/1000).toFixed(0)}K</td>
     <td><div style="color:${pctColor(d.pct)};font-weight:600">${d.pct}%</div><div class="pct-bar"><div class="pct-fill" style="width:${d.pct}%;background:${pctColor(d.pct)}"></div></div></td>
-    <td style="color:var(--text2)">$${(exp/1000).toFixed(0)}K</td>
-    <td style="color:var(--text3)">${d.close}</td>
+    <td style="color:#94a3b8">$${(exp/1000).toFixed(0)}K</td>
+    <td style="color:#64748b">${d.close}</td>
     <td style="color:${pctColor(d.pct)}">${d.pct>=75?'🟢 High':d.pct>=50?'🟡 Medium':d.pct>=25?'🟠 Low-Med':'🔴 Low'}</td>
   </tr>`;
 });
 
+// ══════════════════════════════════════════════════════════════════
+// GROWTH PLAN TAB — dynamic content
+// ══════════════════════════════════════════════════════════════════
+
 // ── Backward funnel ───────────────────────────────────────────────
+// Funnel: top = outreach (widest), bottom = revenue gap (narrowest) — classic funnel shape
 const funnelStages = [
-  { label: 'Outreach touches',        value: '~550–650',  conv: 'Starting point',            color: '#3b82f6', pct: 100 },
-  { label: 'Warm responses / replies',value: '~165',      conv: '28% response rate',         color: '#10b981', pct: 28  },
-  { label: 'Qualified intro calls',   value: '~100',      conv: '60% book a call',           color: '#f59e0b', pct: 16  },
-  { label: 'Proposals / deep convos', value: '~40',       conv: '40% progress to proposal',  color: '#f97316', pct: 7   },
-  { label: 'New deals closed',        value: '~15 deals', conv: '40% close rate · avg $45K', color: '#ef4444', pct: 3   },
-  { label: 'Revenue gap closed',      value: '$692K',     conv: '$1.25M target',             color: '#dc2626', pct: 1.5 },
+  { label: 'Outreach touches',        value: '~550–650', conv: 'Starting point',              color: '#60a5fa', pct: 100 },
+  { label: 'Warm responses / replies',value: '~165',     conv: '28% response rate',           color: '#4ade80', pct: 28  },
+  { label: 'Qualified intro calls',   value: '~100',     conv: '60% book a call',             color: '#facc15', pct: 16  },
+  { label: 'Proposals / deep convos', value: '~40',      conv: '40% progress to proposal',    color: '#f59e0b', pct: 7   },
+  { label: 'New deals closed',        value: '~15 deals',conv: '40% close rate · avg $45K',   color: '#fb923c', pct: 3   },
+  { label: 'Revenue gap closed',      value: '$692K',    conv: '$1.25M target',               color: '#f87171', pct: 1.5 },
 ];
 const funnelEl = document.getElementById('backwardFunnel');
 funnelStages.forEach((s, i) => {
-  const margin = ((100 - s.pct) / 2) * 0.72;
+  // Centered trapezoid shape: margin grows as pct shrinks
+  const margin = ((100 - s.pct) / 2) * 0.72; // max ~36% each side at bottom
   funnelEl.innerHTML += `
     <div style="margin: 0 ${margin.toFixed(1)}% 0 ${margin.toFixed(1)}%; background:${s.color}18; border:1px solid ${s.color}44; border-radius:4px; padding:8px 16px; display:flex; align-items:center; justify-content:space-between; transition: margin .3s;">
       <span style="font-size:12px;font-weight:700;color:${s.color};">${s.value}</span>
-      <span style="font-size:12px;font-weight:600;color:var(--text);">${s.label}</span>
-      <span style="font-size:11px;color:var(--text3);">${s.conv}</span>
+      <span style="font-size:12px;font-weight:600;color:#e2e8f0;">${s.label}</span>
+      <span style="font-size:11px;color:#64748b;">${s.conv}</span>
     </div>
-    ${i < funnelStages.length - 1 ? `<div style="text-align:center;color:var(--text4);font-size:13px;line-height:1.2;margin:1px 0;">▼</div>` : ''}
+    ${i < funnelStages.length - 1 ? `<div style="text-align:center;color:#475569;font-size:13px;line-height:1.2;margin:1px 0;">▼</div>` : ''}
   `;
 });
 
-// ── Timeline ──────────────────────────────────────────────────────
+// ── Timeline visualization ────────────────────────────────────────
 const timelineData = [
-  { type: '3PL',               closeBy: 'Jun 30', convBy: 'Apr 30', weeksLeft: 7,  status: 'red',    note: 'Warm leads / referrals: 6–8 week cycle, close by Jun 30. Cold outreach window has passed — only existing relationships have a shot.' },
+  { type: '3PL',              closeBy: 'Jun 30',  convBy: 'Apr 30', weeksLeft: 7,  status: 'red',    note: 'Warm leads / referrals: 6–8 week cycle, close by Jun 30. Cold outreach window has passed — only existing relationships have a shot.' },
   { type: 'Packaging / Shipping', closeBy: 'Jul 15', convBy: 'May 31', weeksLeft: 11, status: 'yellow', note: '6–8 week close cycle. 11 weeks to last first conversation — act in April.' },
 ];
 const tlEl = document.getElementById('timelineViz');
 const totalWeeks = 24;
 timelineData.forEach(t => {
   const fillPct = Math.max(4, (t.weeksLeft / totalWeeks) * 100);
-  const statusColors = { red: '#dc2626', yellow: '#ca8a04', green: '#16a34a' };
+  const statusColors = { red: '#f87171', yellow: '#facc15', green: '#4ade80' };
   const col = statusColors[t.status];
   tlEl.innerHTML += `
     <div style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-        <span style="font-size:12px;font-weight:600;color:var(--text);">${t.type}</span>
-        <span style="font-size:11px;color:var(--text3);">Close by <strong style="color:${col}">${t.closeBy}</strong> · First convo by <strong style="color:${col}">${t.convBy}</strong></span>
+        <span style="font-size:12px;font-weight:600;color:#e2e8f0;">${t.type}</span>
+        <span style="font-size:11px;color:#64748b;">Close by <strong style="color:${col}">${t.closeBy}</strong> · First convo by <strong style="color:${col}">${t.convBy}</strong></span>
       </div>
-      <div style="background:var(--bg3);border-radius:6px;height:28px;position:relative;overflow:hidden;">
+      <div style="background:#1e2433;border-radius:6px;height:28px;position:relative;overflow:hidden;">
         <div style="position:absolute;left:0;top:0;width:${fillPct}%;height:100%;background:${col}22;border-right:2px solid ${col};display:flex;align-items:center;padding:0 10px;">
           <span style="font-size:11px;font-weight:600;color:${col};">${t.weeksLeft === 0 ? '⚠ Window closed' : t.weeksLeft + ' weeks left'}</span>
         </div>
-        <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text4);">Aug 31</div>
+        <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#475569;">Aug 31</div>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;">${t.note}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:4px;">${t.note}</div>
     </div>
   `;
 });
 
 // ── Channel table ─────────────────────────────────────────────────
-// tam = addressable universe, resp = response/engagement %, close = close %, deals = est deals/yr, rev = est revenue contribution, weeklyAsk, note
 const channels = [
-  {
-    name: 'StartOps Partnership',   status: 'yellow',
-    tam: '~100 ICP', resp: '60–80%', close: '25–35%', deals: '6–12',
-    rev: '$270–540K', revColor: '#16a34a',
-    weeklyAsk: 'Audit cadence',
-    note: 'Ongoing. ~300 members, ~100 in ICP. Strategy: co-branded webinars + Ops Stack Audit for all members (free call to diagnose logistics challenges → natural handoff to OC). Warm channel — these operators already trust StartOps. Audit → proposal conversion should be 30%+. Highest ROI channel in the model.'
-  },
-  {
-    name: 'Core Partners (15–20)',  status: 'yellow',
-    tam: '15–20', resp: '80–90%', close: '40–60%', deals: '6–10',
-    rev: '$135–225K', revColor: '#16a34a',
-    weeklyAsk: '4–5 touches/wk',
-    note: 'Monthly cadence. Supply chain consultants, financing cos, marketing agencies, fellow operators. Highest close rate in the model — these are warm referrals from trusted contacts. Need a structured monthly check-in: share deal update, ask for intros, stay top of mind.'
-  },
-  {
-    name: 'LinkedIn Cold DMs',      status: 'red',
-    tam: 'Unlimited', resp: '25–30%', close: '5–10%', deals: '4–8',
-    rev: '$90–180K', revColor: '#d97706',
-    weeklyAsk: '30–50 DMs/wk',
-    note: 'Not started. Highest volume channel available. DTC founders are reachable; decision-makers are visible. At 40 DMs/wk → ~10 responses → ~6 calls → ~1 deal/month. Every week of delay removes 40–50 touches from the funnel. Start immediately.'
-  },
-  {
-    name: 'Secondary Partners (~20)',status: 'yellow',
-    tam: '~20', resp: '60–70%', close: '30–50%', deals: '2–5',
-    rev: '$45–113K', revColor: '#d97706',
-    weeklyAsk: '2–3 touches/wk',
-    note: 'Every 2 months. Lower signal than core partners but still warm. Don\'t let these go cold — a single deal per quarter from this tier justifies the cadence. Flag which ones are most active / have referred before.'
-  },
-  {
-    name: 'Hosted / Attended Dinners', status: 'green',
-    tam: '8–15/event', resp: '70%+', close: '25–40%', deals: '3–6',
-    rev: '$68–135K', revColor: '#d97706',
-    weeklyAsk: '1–2/month',
-    note: 'Highest relationship depth per hour spent. The people at your dinners are the ones who refer deals 3–6 months later. Invest here — both hosting and attending. Track who attends and follow up within 48h.'
-  },
-  {
-    name: 'Conferences (3 planned)', status: 'yellow',
-    tam: 'varies', resp: '20–30%', close: '15–25%', deals: '2–4',
-    rev: '$45–90K', revColor: '#64748b',
-    weeklyAsk: '1 event/qtr',
-    note: '3 events planned this year. Good for new relationships and re-activating warm contacts. Most conference value is lost by day 3 without follow-up — build a follow-up workflow. Not a high-volume channel but quality is high.'
-  },
-  {
-    name: 'Monthly Newsletter',      status: 'yellow',
-    tam: 'Full network', resp: 'Indirect', close: 'Indirect', deals: '1–3',
-    rev: '$23–68K', revColor: '#64748b',
-    weeklyAsk: '1×/month',
-    note: 'First week of every month. All brands + partners. Keeps OC top of mind for people who aren\'t in active conversations. Low effort, broad reach. Indirect channel — leads don\'t close from newsletters alone, but they accelerate deals already in motion.'
-  },
-  {
-    name: 'LinkedIn Content',        status: 'yellow',
-    tam: 'Network', resp: 'Indirect', close: 'Indirect', deals: '0–2',
-    rev: '$0–45K', revColor: '#64748b',
-    weeklyAsk: '1–2 posts/wk',
-    note: 'Currently ~1 post/week. No direct inbound yet but compounds over time — reinforces credibility with people who already know OC. Low direct ROI this year; long-term brand play. Keep the cadence but don\'t optimize here at the expense of higher-impact channels.'
-  },
+  { name: 'Core Partners (15–20)',      status: 'yellow', dealsQtr: '3–6',  closeRate: '40–60%', weeklyAsk: '4–5 touches/wk', note: 'Monthly cadence. Supply chain consultants, financing cos, marketing agencies, fellow operators. Highest-signal referrals. Need a structured monthly check-in rhythm.' },
+  { name: 'Secondary Partners (~20)',   status: 'yellow', dealsQtr: '1–3',  closeRate: '30–50%', weeklyAsk: '2–3 touches/wk', note: 'Every 2 months. Lower signal but still warm. Don\'t let these go cold — a single deal from each tier justifies the effort.' },
+  { name: 'LinkedIn Cold DMs',          status: 'red',    dealsQtr: '1–3',  closeRate: '5–10%',  weeklyAsk: '30–50 DMs/wk',   note: 'Not started. Highest volume channel available. DTC founders are reachable on LinkedIn. Start immediately — every week of delay is 30–50 fewer touches.' },
+  { name: 'Monthly Newsletter',         status: 'yellow', dealsQtr: '0–2',  closeRate: 'Indirect',weeklyAsk: '1×/month',        note: 'Sent first week of every month to all brands + partners in network. Keeps OC top of mind. Low effort, broad reach. Consistency matters more than perfection.' },
+  { name: 'LinkedIn Content',           status: 'yellow', dealsQtr: '0–1',  closeRate: 'Indirect',weeklyAsk: '1–2 posts/wk',    note: 'Currently ~1 post/week. No direct inbound yet but reinforces credibility with people who already know OC. Compounds over time.' },
+  { name: 'Conferences (3 planned)',    status: 'yellow', dealsQtr: '1–2',  closeRate: '20–35%', weeklyAsk: '1 event/qtr',     note: '3 this year. Great for new relationships and re-activating warm contacts. Follow up within 48h — most conference value is lost by day 3.' },
+  { name: 'Hosted / Attended Dinners', status: 'green',  dealsQtr: '1–2',  closeRate: '25–40%', weeklyAsk: '1–2/month',       note: 'Highest relationship depth per hour. Invest here. The people at your dinners are the ones who refer deals.' },
 ];
 const statusLabel = { green: 'Active', yellow: 'Partial', red: 'Not started' };
 const chEl = document.getElementById('channelTable');
 channels.forEach(c => {
   chEl.innerHTML += `
-    <div style="display:grid;grid-template-columns:180px 70px 70px 70px 70px 80px 80px 1fr;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;">
-      <div style="font-weight:600;color:var(--text);padding-top:2px;">${c.name}</div>
-      <div style="padding-top:2px;"><span class="status-dot dot-${c.status}"></span><span style="color:var(--text2);font-size:11px;">${statusLabel[c.status]}</span></div>
-      <div style="color:var(--text2);font-size:11px;padding-top:2px;">${c.tam}</div>
-      <div style="color:var(--text2);font-size:11px;padding-top:2px;">${c.resp}</div>
-      <div style="color:var(--text2);font-size:11px;padding-top:2px;">${c.close}</div>
-      <div style="color:var(--text2);font-size:11px;padding-top:2px;">${c.deals} deals</div>
-      <div style="font-weight:700;font-size:12px;color:${c.revColor};padding-top:2px;">${c.rev}</div>
-      <div style="color:var(--text3);font-size:11px;line-height:1.5;">${c.note}</div>
+    <div style="display:grid;grid-template-columns:180px 80px 100px 90px 80px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #1e2433;font-size:12px;">
+      <div style="font-weight:600;color:#e2e8f0;">${c.name}</div>
+      <div><span class="status-dot dot-${c.status}"></span><span style="color:#94a3b8;font-size:11px;">${statusLabel[c.status]}</span></div>
+      <div style="color:#94a3b8;">${c.dealsQtr}</div>
+      <div style="color:#94a3b8;">${c.closeRate}</div>
+      <div style="background:#1e2433;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;color:#fbbf24;text-align:center;">${c.weeklyAsk}</div>
+      <div style="color:#64748b;font-size:11px;">${c.note}</div>
     </div>
   `;
+});
+
+// ── Weekly pace chart ─────────────────────────────────────────────
+const paceWeeks = ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'];
+const paceTargets = {
+  'LinkedIn DMs':     [35, 35, 40, 40, 45, 45, 50, 50],
+  'Partner Meetings': [1,  1,  1,  1,  1,  1,  1,  1 ],
+  'Referral Asks':    [2,  2,  2,  2,  2,  2,  2,  2 ],
+  'Intro Calls':      [2,  2,  3,  3,  3,  4,  4,  4 ],
+};
+new Chart(document.getElementById('paceChart'), {
+  type: 'bar',
+  data: {
+    labels: paceWeeks,
+    datasets: [
+      { label: 'LinkedIn DMs (target)', data: paceTargets['LinkedIn DMs'], backgroundColor: 'rgba(37,99,235,0.6)', stack: 'a' },
+      { label: 'Partner Meetings ×10', data: paceTargets['Partner Meetings'].map(v=>v*10), backgroundColor: 'rgba(5,150,105,0.6)', stack: 'a' },
+      { label: 'Referral Asks ×10',    data: paceTargets['Referral Asks'].map(v=>v*10),    backgroundColor: 'rgba(124,58,237,0.6)', stack: 'a' },
+      { label: 'Intro Calls ×5',       data: paceTargets['Intro Calls'].map(v=>v*5),       backgroundColor: 'rgba(251,191,36,0.6)', stack: 'a' },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: ctx => {
+        const labels = ['LinkedIn DMs','Partner Meetings','Referral Asks','Intro Calls'];
+        const actuals = [paceTargets['LinkedIn DMs'], paceTargets['Partner Meetings'], paceTargets['Referral Asks'], paceTargets['Intro Calls']];
+        return ` ${labels[ctx.datasetIndex]}: ${actuals[ctx.datasetIndex][ctx.dataIndex]}`;
+      }}}
+    },
+    scales: {
+      x: { ...darkScales.x, stacked: true },
+      y: { ...darkScales.y, stacked: true, ticks: { color: '#64748b', font: { size: 11 } } }
+    }
+  }
 });
 
 // Pace summary cards
 const paceCardData = [
-  { label: 'LinkedIn DMs / week',     target: '35–50', color: '#2563eb', note: 'DTC founders, ops leads' },
-  { label: 'Partner meetings / week', target: '1',     color: '#16a34a', note: 'Agencies, consultants, fintechs' },
-  { label: 'Referral asks / week',    target: '2',     color: '#7c3aed', note: 'Existing clients + network' },
-  { label: 'Intro calls / week',      target: '3–4',   color: '#d97706', note: 'Qualified first conversations' },
+  { label: 'LinkedIn DMs / week',    target: '35–50',  color: '#60a5fa', note: 'DTC founders, ops leads' },
+  { label: 'Partner meetings / week',target: '1',      color: '#4ade80', note: 'Agencies, consultants, fintechs' },
+  { label: 'Referral asks / week',   target: '2',      color: '#c084fc', note: 'Existing clients + network' },
+  { label: 'Intro calls / week',     target: '3–4',    color: '#fbbf24', note: 'Qualified first conversations' },
 ];
 const paceCardsEl = document.getElementById('paceCards');
 paceCardData.forEach(p => {
   paceCardsEl.innerHTML += `
-    <div style="background:var(--bg3);border-left:3px solid ${p.color};border-radius:0 8px 8px 0;padding:10px 14px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px;">${p.label}</div>
+    <div style="background:#1e2433;border-left:3px solid ${p.color};border-radius:0 8px 8px 0;padding:10px 14px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">${p.label}</div>
       <div style="font-size:22px;font-weight:700;color:${p.color};">${p.target}</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;">${p.note}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">${p.note}</div>
     </div>
   `;
 });
 
-// ── This Week cards ───────────────────────────────────────────────
-const thisWeekActions = [
-  { icon: '🤝', label: 'StartOps Audit Invites', target: '20 members', sub: 'First ICP batch — email + DM', color: '#1c3a2a', light: '#dcfce7' },
-  { icon: '📞', label: '3PL Partner Check-ins', target: '3–4 calls',   sub: '7-week window — act now',    color: '#dc2626', light: '#fee2e2' },
-  { icon: '💬', label: 'LinkedIn Cold DMs',      target: '35–40 DMs',  sub: 'DTC founders · ops leads',   color: '#2563eb', light: '#dbeafe' },
-  { icon: '🍽', label: 'Dinner / Event',         target: '1 scheduled', sub: 'Host or attend this week',  color: '#d97706', light: '#fef3c7' },
-  { icon: '📬', label: 'Partner Referral Asks',  target: '2 asks',     sub: 'Warm contacts in network',   color: '#7c3aed', light: '#f3e8ff' },
-];
-const twEl = document.getElementById('thisWeekCards');
-thisWeekActions.forEach(a => {
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  twEl.innerHTML += `
-    <div style="background:var(--bg3);border-radius:10px;padding:12px 14px;border:1px solid var(--border);border-top:3px solid ${a.color};">
-      <div style="font-size:18px;margin-bottom:6px;">${a.icon}</div>
-      <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;">${a.label}</div>
-      <div style="font-size:18px;font-weight:700;color:${a.color};margin-bottom:3px;">${a.target}</div>
-      <div style="font-size:10px;color:var(--text3);">${a.sub}</div>
-    </div>
-  `;
-});
-
-// Build charts on load
-buildCharts();
 </script>
 </body>
 </html>
