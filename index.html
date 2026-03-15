@@ -3,668 +3,927 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Operating Crew — Pipeline Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Yan & Sonam — Credit Card Dashboard</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; }
-  .topbar { background: #0f1117; border-bottom: 1px solid #1e2433; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .topbar h1 { font-size: 18px; font-weight: 700; color: #fff; }
-  .topbar .sub { font-size: 12px; color: #475569; margin-top: 2px; }
-  .tabs { display: flex; gap: 4px; }
-  .tab-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid #252d3d; background: transparent; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
-  .tab-btn.active { background: #1e2433; color: #e2e8f0; border-color: #3b4560; }
-  .tab-btn:hover:not(.active) { color: #94a3b8; border-color: #3b4560; }
-  .page { display: none; padding: 24px; }
-  .page.active { display: block; }
-  .grid { display: grid; gap: 16px; }
-  .col2 { grid-template-columns: 1fr 1fr; }
-  .col4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-  .col3 { grid-template-columns: 1fr 1fr 1fr; }
-  .card { background: #1a1f2e; border-radius: 12px; padding: 18px 20px; border: 1px solid #252d3d; }
-  .card-title { font-size: 11px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
-  .stat-val { font-size: 26px; font-weight: 700; color: #fff; }
-  .stat-sub { font-size: 11px; color: #64748b; margin-top: 4px; }
-  .chart-wrap { position: relative; }
-  .section { margin-bottom: 16px; }
-  .deal-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .deal-table th { text-align: left; color: #475569; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #252d3d; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
-  .deal-table td { padding: 7px 8px; border-bottom: 1px solid #1e2433; color: #cbd5e1; }
-  .deal-table tr:last-child td { border-bottom: none; }
-  .deal-table tr:hover td { background: #1e2433; }
-  .badge { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 600; }
-  .badge-3pl { background: #1e3a5f; color: #60a5fa; }
-  .badge-pkg { background: #2d1b4e; color: #c084fc; }
-  .badge-ship { background: #1a3a2a; color: #4ade80; }
-  .badge-cons { background: #3a2a1a; color: #fb923c; }
-  .pct-bar { background: #252d3d; border-radius: 4px; height: 5px; margin-top: 4px; }
-  .pct-fill { height: 5px; border-radius: 4px; }
-  .insight { background: #1e2433; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 11px 14px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; color: #94a3b8; }
-  .insight strong { color: #e2e8f0; }
-  .insight .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #3b82f6; font-weight: 700; margin-bottom: 3px; }
-  .green { color: #4ade80; } .yellow { color: #facc15; } .red { color: #f87171; } .blue { color: #60a5fa; } .amber { color: #fbbf24; }
-  .warn-box { background: #2a1a1a; border: 1px solid #7f1d1d; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px; }
-  .info-box { background: #1e2433; border-left: 3px solid #475569; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 16px; }
-  /* Growth plan specific */
-  .funnel-stage { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .funnel-bar-wrap { flex: 1; background: #1e2433; border-radius: 6px; height: 36px; position: relative; overflow: hidden; }
-  .funnel-bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; transition: width .4s; }
-  .funnel-meta { width: 160px; text-align: right; font-size: 11px; color: #64748b; flex-shrink: 0; }
-  .funnel-label { width: 160px; font-size: 12px; font-weight: 600; color: #94a3b8; flex-shrink: 0; }
-  .funnel-arrow { color: #475569; font-size: 14px; margin: -4px 0 -4px 172px; }
-  .channel-row { display: grid; grid-template-columns: 180px 80px 100px 90px 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #1e2433; font-size: 12px; }
-  .channel-row:last-child { border-bottom: none; }
-  .channel-row .ch-name { font-weight: 600; color: #e2e8f0; }
-  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
-  .dot-green { background: #4ade80; } .dot-yellow { background: #facc15; } .dot-red { background: #f87171; }
-  .week-target { background: #1e2433; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700; text-align: center; }
-  .timeline-wrap { position: relative; margin: 20px 0 8px; }
-  .toggle-row { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
-  .tog-btn { font-size: 10px; font-weight: 600; padding: 5px 14px; border-radius: 6px; border: 1px solid #475569; background: #1a1f2e; color: #94a3b8; cursor: pointer; }
-  .tog-btn.active-actual { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
-  .tog-btn.active-expected { border-color: #f59e0b; background: #3a2a00; color: #fbbf24; }
-  .tog-btn.active-full { border-color: #475569; background: #252d3d; color: #cbd5e1; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; color: #1d1d1f; }
+
+  /* ── Header ── */
+  header { background: #1d1d1f; color: white; padding: 24px 40px 0; }
+  header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  header p { font-size: 13px; color: #888; margin-top: 3px; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; margin-top: 20px; }
+  .tab { padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; color: #888; border-bottom: 3px solid transparent; transition: all 0.15s; user-select: none; }
+  .tab:hover { color: #ccc; }
+  .tab.active { color: white; border-bottom-color: white; }
+
+  /* ── Tab panels ── */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Shared ── */
+  .pad { padding: 28px 40px; }
+
+  /* ── Urgent banner ── */
+  .urgent-banner { margin: 20px 40px 0; background: #fff0f0; border: 1.5px solid #ffc0c0; border-radius: 12px; padding: 14px 20px; }
+  .urgent-banner h3 { font-size: 12px; font-weight: 700; color: #d70015; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .urgent-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .urgent-item { background: white; border: 1px solid #ffc0c0; border-radius: 8px; padding: 8px 12px; font-size: 12px; }
+  .urgent-item strong { display: block; font-size: 13px; color: #d70015; }
+  .urgent-item span { color: #6e6e73; }
+
+  /* ── Summary stats ── */
+  .summary { padding: 20px 40px 0; display: flex; gap: 14px; flex-wrap: wrap; }
+  .stat { background: white; border-radius: 12px; padding: 14px 18px; min-width: 148px; border: 1px solid #e5e5e7; }
+  .stat-label { font-size: 11px; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 24px; font-weight: 700; margin-top: 3px; letter-spacing: -0.5px; }
+  .stat-value.green { color: #1a8a3c; }
+  .stat-value.blue { color: #0071e3; }
+  .stat-value.red { color: #d70015; }
+  .stat-value.orange { color: #bf5500; }
+  .stat-value.purple { color: #6e5ae0; }
+
+  /* ── Filter bar ── */
+  .controls { background: white; border-bottom: 1px solid #e5e5e7; padding: 12px 40px; display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .filter-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .filter-label { font-size: 11px; color: #6e6e73; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; width: 90px; flex-shrink: 0; }
+  .filter-btn { padding: 5px 13px; border-radius: 20px; border: 1.5px solid #d2d2d7; background: white; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.15s; color: #6e6e73; }
+  .filter-btn:hover { border-color: #1d1d1f; color: #1d1d1f; }
+  .filter-btn.active { color: white; border-color: #1d1d1f; background: #1d1d1f; }
+  .filter-btn.owner-yan.active    { background: #1a56db; border-color: #1a56db; }
+  .filter-btn.owner-sonam.active  { background: #9d174d; border-color: #9d174d; }
+  .filter-btn.auto.active    { background: #1a8a3c; border-color: #1a8a3c; }
+  .filter-btn.worth.active   { background: #0071e3; border-color: #0071e3; }
+  .filter-btn.passive.active { background: #6e5ae0; border-color: #6e5ae0; }
+  .filter-btn.skip.active    { background: #8e8e93; border-color: #8e8e93; }
+  .filter-btn.urgent.active  { background: #d70015; border-color: #d70015; }
+
+  /* ── Cards grid ── */
+  .cards-grid { padding: 24px 40px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+  .card { background: white; border-radius: 16px; border: 1px solid #e5e5e7; overflow: hidden; transition: box-shadow 0.2s; }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .card.is-cancel { border-color: #ffc0c0; }
+  .card.is-downgrade { border-color: #ffe0a0; }
+  .card-header { padding: 16px 20px 12px; border-bottom: 1px solid #f0f0f5; }
+  .card-name { font-size: 15px; font-weight: 600; }
+  .card-meta { display: flex; gap: 7px; margin-top: 5px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 11px; padding: 3px 7px; border-radius: 6px; font-weight: 600; }
+  .badge-owner-yan    { background: #e8f0fe; color: #1a56db; }
+  .badge-owner-sonam  { background: #fce8f3; color: #9d174d; }
+  .badge-fee          { background: #f0f0f5; color: #3a3a3c; }
+  .badge-renewal      { background: #fff3cd; color: #856404; }
+  .badge-cancel       { background: #ffe0e0; color: #c0392b; font-weight: 700; }
+  .badge-downgrade    { background: #fff3cd; color: #856404; font-weight: 700; }
+  .badge-last4        { background: #f0f0f5; color: #6e6e73; font-weight: 500; }
+  .badge-points       { background: #f0f5ff; color: #1a56db; }
+  .perks-list { padding: 10px 0; }
+  .perk-item { padding: 9px 20px; display: flex; align-items: flex-start; gap: 12px; border-bottom: 1px solid #f5f5f7; transition: background 0.1s; }
+  .perk-item:last-child { border-bottom: none; }
+  .perk-item:hover { background: #fafafa; }
+  .perk-item.confirmed { background: #f6fff9; }
+  .perk-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .perk-dot.auto    { background: #1a8a3c; }
+  .perk-dot.worth   { background: #0071e3; }
+  .perk-dot.passive { background: #6e5ae0; }
+  .perk-dot.skip    { background: #d2d2d7; }
+  .perk-dot.urgent  { background: #d70015; }
+  .perk-content { flex: 1; }
+  .perk-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .perk-confirmed { font-size: 10px; background: #d4edda; color: #1a8a3c; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+  .perk-missing   { font-size: 10px; background: #ffe0e0; color: #d70015; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+  .perk-desc { font-size: 12px; color: #6e6e73; margin-top: 2px; line-height: 1.4; }
+  .perk-value { font-size: 12px; font-weight: 700; margin-left: auto; flex-shrink: 0; padding-left: 12px; }
+  .perk-value.auto    { color: #1a8a3c; }
+  .perk-value.worth   { color: #0071e3; }
+  .perk-value.passive { color: #6e5ae0; }
+  .perk-value.skip    { color: #8e8e93; text-decoration: line-through; }
+  .perk-value.urgent  { color: #d70015; }
+  .tier-label { padding: 7px 20px 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+  .tier-label.auto    { color: #1a8a3c; }
+  .tier-label.worth   { color: #0071e3; }
+  .tier-label.passive { color: #6e5ae0; }
+  .tier-label.skip    { color: #8e8e93; }
+  .tier-label.urgent  { color: #d70015; }
+  .card-total { padding: 11px 20px; background: #f9f9fb; border-top: 1px solid #e5e5e7; display: flex; justify-content: space-between; align-items: center; }
+  .card-total-label { font-size: 12px; color: #6e6e73; }
+  .card-total-value { font-size: 14px; font-weight: 700; }
+
+  /* ── Spend routing tab ── */
+  .routing-legend { background: white; border-bottom: 1px solid #e5e5e7; padding: 12px 40px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #3a3a3c; font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .routing-grid { padding: 24px 40px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; }
+  .category-card { background: white; border-radius: 14px; border: 1px solid #e5e5e7; overflow: hidden; transition: box-shadow 0.2s; }
+  .category-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .cat-header { padding: 14px 18px 10px; border-bottom: 1px solid #f0f0f5; display: flex; align-items: center; gap: 10px; }
+  .cat-icon { font-size: 22px; line-height: 1; }
+  .cat-title { font-size: 14px; font-weight: 700; }
+  .cat-subtitle { font-size: 11px; color: #6e6e73; margin-top: 1px; }
+  .card-options { padding: 10px 0 6px; }
+  .card-row { padding: 9px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f5f5f7; }
+  .card-row:last-child { border-bottom: none; }
+  .card-row.primary   { background: #f6fff9; }
+  .card-row.secondary { background: white; }
+  .card-row.avoid     { background: #fff8f8; opacity: 0.7; }
+  .rank-badge { font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rank-1     { background: #1a8a3c; color: white; }
+  .rank-2     { background: #e5f0ff; color: #0071e3; }
+  .rank-avoid { background: #ffe0e0; color: #d70015; font-size: 13px; }
+  .card-info { flex: 1; }
+  .card-info-name  { font-size: 12px; font-weight: 600; color: #1d1d1f; }
+  .card-info-owner { font-size: 11px; color: #6e6e73; }
+  .card-info-note  { font-size: 10px; color: #6e6e73; margin-top: 1px; }
+  .rate-badge { font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .rate-green { color: #1a8a3c; }
+  .rate-blue  { color: #0071e3; }
+  .rate-gray  { color: #8e8e93; }
+  .rate-red   { color: #d70015; }
+  .routing-note { padding: 7px 18px 10px; font-size: 11px; color: #6e6e73; line-height: 1.4; background: #fafafa; border-top: 1px solid #f0f0f5; }
+
+  /* Mini card art */
+  .mini-card { width: 50px; height: 31px; border-radius: 4px; position: relative; flex-shrink: 0; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+  .mini-card .chip  { position: absolute; top: 5px; left: 5px; width: 8px; height: 6px; border-radius: 1.5px; background: rgba(255,255,255,0.35); z-index: 2; }
+  .mini-card .logo  { position: absolute; top: 4px; right: 4px; font-size: 7px; font-weight: 800; z-index: 2; }
+  .mini-card .label { position: absolute; bottom: 3px; left: 5px; right: 5px; font-size: 6.5px; font-weight: 700; letter-spacing: 0.2px; line-height: 1.2; z-index: 2; }
+  .mini-card .shine { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%); z-index: 1; }
+  .mc-amex-plat    { background: linear-gradient(135deg, #9b8c6e 0%, #c9b68a 40%, #8a7a5c 100%); color: #fff8e7; }
+  .mc-biz-gold     { background: linear-gradient(135deg, #c8a84b 0%, #e8c96a 50%, #a8883b 100%); color: #3a2800; }
+  .mc-biz-plat     { background: linear-gradient(135deg, #6b7280 0%, #9ca3af 50%, #4b5563 100%); color: #fff; }
+  .mc-csr          { background: linear-gradient(135deg, #374151 0%, #111827 100%); color: #e5d5b0; }
+  .mc-venturex     { background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%); color: #e0e7ff; }
+  .mc-ink          { background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%); color: #bfdbfe; }
+  .mc-bilt         { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: #e5e5e5; }
+  .mc-amazon       { background: linear-gradient(135deg, #232f3e 0%, #131921 100%); color: #ff9900; }
+  .mc-freedom      { background: linear-gradient(135deg, #1e40af 0%, #1e3a5f 100%); color: #93c5fd; }
+
+  /* ── Points tab ── */
+  .points-grid { padding: 24px 40px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
+  .currency-card { background: white; border-radius: 16px; border: 1px solid #e5e5e7; overflow: hidden; }
+  .currency-header { padding: 18px 20px 14px; border-bottom: 1px solid #f0f0f5; display: flex; align-items: center; gap: 14px; }
+  .currency-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .currency-name { font-size: 15px; font-weight: 700; }
+  .currency-balance { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 1px; }
+  .currency-value { font-size: 12px; color: #6e6e73; margin-top: 1px; }
+  .partners-list { padding: 12px 0; }
+  .partner-row { padding: 9px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f5f5f7; }
+  .partner-row:last-child { border-bottom: none; }
+  .partner-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .partner-ratio { font-size: 12px; color: #6e6e73; }
+  .partner-value { font-size: 12px; font-weight: 700; }
+  .partner-rec { font-size: 10px; background: #e8f5e9; color: #1a8a3c; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+  .partner-rec-blue { background: #e8f0fe; color: #0071e3; }
+  .points-note { padding: 12px 20px; background: #fafafa; border-top: 1px solid #f0f0f5; font-size: 12px; color: #6e6e73; line-height: 1.5; }
+  .points-section-label { padding: 8px 20px 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #6e6e73; }
+
+  @media (max-width: 600px) {
+    header, .controls, .routing-legend, .summary, .cards-grid, .urgent-banner, .routing-grid, .points-grid { padding-left: 16px; padding-right: 16px; }
+    .cards-grid, .routing-grid, .points-grid { grid-template-columns: 1fr; }
+    .tab { padding: 10px 14px; font-size: 13px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div>
-    <div class="topbar h1">Operating Crew — Pipeline Dashboard</div>
-    <div class="sub">As of March 15, 2026 · Based on Forecast tab</div>
-  </div>
+<header>
+  <h1>Yan & Sonam — Credit Card Dashboard</h1>
+  <p>Updated March 15, 2026 · Verified against Monarch transactions + Amex benefit screens</p>
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('info')">Info</button>
-    <button class="tab-btn" onclick="showTab('growth')">Growth Plan</button>
+    <div class="tab active" onclick="switchTab('perks', this)">Perks & Credits</div>
+    <div class="tab" onclick="switchTab('routing', this)">Spend Routing</div>
+    <div class="tab" onclick="switchTab('points', this)">Points Summary</div>
+    <div class="tab" onclick="switchTab('value', this)">Return on Spend</div>
   </div>
+</header>
+
+<!-- ════════════════════════════════════════
+     TAB 1: PERKS & CREDITS
+════════════════════════════════════════ -->
+<div id="tab-perks" class="tab-panel active">
+
+  <div class="urgent-banner">
+    <h3>🔴 Act Before March 31</h3>
+    <div class="urgent-items">
+      <div class="urgent-item"><strong>Resy $100</strong><span>Q1 expires Mar 31 — book a Resy restaurant now</span></div>
+      <div class="urgent-item"><strong>Saks $50</strong><span>H1 credit available — buy anything at saks.com</span></div>
+      <div class="urgent-item"><strong>Amex Plat Hotel $300</strong><span>H1 credit unused — book via Amex Travel</span></div>
+      <div class="urgent-item"><strong>Biz Plat Airline $200</strong><span>Buy United TravelBank before canceling (window ~May 8)</span></div>
+      <div class="urgent-item"><strong>Biz Plat Dell $150</strong><span>Any OC tech purchases before canceling?</span></div>
+      <div class="urgent-item"><strong>T-Mobile</strong><span>Move billing to Ink Biz Cash (830) before canceling Biz Plat</span></div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="stat"><div class="stat-label">Annual Fees (kept)</div><div class="stat-value red" id="total-fees">—</div></div>
+    <div class="stat"><div class="stat-label">Automatic Value</div><div class="stat-value green" id="auto-value">—</div></div>
+    <div class="stat"><div class="stat-label">Worth-It Value</div><div class="stat-value blue" id="worth-value">—</div></div>
+    <div class="stat"><div class="stat-label">Net After Credits</div><div class="stat-value green" id="net-value">—</div></div>
+    <div class="stat"><div class="stat-label">Fees Saved (canceling)</div><div class="stat-value orange">$1,840/yr</div></div>
+  </div>
+
+  <div class="controls" style="margin-top:20px;">
+    <div class="filter-row">
+      <span class="filter-label">Cardholder</span>
+      <button class="filter-btn owner-yan active"   id="btn-yan"   onclick="toggleOwner('yan')">Yan</button>
+      <button class="filter-btn owner-sonam active" id="btn-sonam" onclick="toggleOwner('sonam')">Sonam</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Reward Tiers</span>
+      <button class="filter-btn urgent active"  id="btn-urgent"  onclick="toggleTier('urgent')">● Urgent</button>
+      <button class="filter-btn auto active"    id="btn-auto"    onclick="toggleTier('auto')">● Automatic</button>
+      <button class="filter-btn worth active"   id="btn-worth"   onclick="toggleTier('worth')">● Worth It</button>
+      <button class="filter-btn passive active" id="btn-passive" onclick="toggleTier('passive')">● Just There</button>
+      <button class="filter-btn skip"           id="btn-skip"    onclick="toggleTier('skip')">● Skip</button>
+    </div>
+  </div>
+
+  <div class="cards-grid" id="perks-grid"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ INFO TAB -->
-<div id="tab-info" class="page active">
-
-  <!-- KPI row -->
-  <div class="grid col4 section">
-    <div class="card">
-      <div class="card-title">Actual Revenue (100% closed)</div>
-      <div class="stat-val blue">$327K</div>
-      <div class="stat-sub">Won-Active deals · locked in</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Expected Revenue (weighted)</div>
-      <div class="stat-val amber">$432K</div>
-      <div class="stat-sub">Close % applied · <span class="red">$818K gap to $1.25M</span></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Full Pipeline (all deals close)</div>
-      <div class="stat-val" style="color:#94a3b8">$558K</div>
-      <div class="stat-sub">Best case · <span class="red">$692K still missing</span></div>
-    </div>
-    <div class="card" style="background:#1a1212;border-color:#3a1a1a;">
-      <div class="card-title" style="color:#f87171;">⚠ Effective Deadline</div>
-      <div class="stat-val red">Aug 31</div>
-      <div class="stat-sub">Deals not closed by Aug 31 are 2027 revenue</div>
-    </div>
+<!-- ════════════════════════════════════════
+     TAB 2: SPEND ROUTING
+════════════════════════════════════════ -->
+<div id="tab-routing" class="tab-panel">
+  <div class="routing-legend">
+    <span style="font-size:12px;color:#6e6e73;font-weight:600;margin-right:4px;">KEY:</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#1a8a3c"></div> Best — use this</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0071e3"></div> Backup / secondary</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d70015"></div> Avoid (leaving points on the table)</div>
   </div>
+  <div class="routing-grid" id="routing-grid"></div>
+</div>
 
-  <!-- Cumulative chart -->
-  <div class="card section">
-    <div class="card-title">Cumulative 2026 Revenue vs $1.25M Goal</div>
-    <div class="info-box">
-      <strong style="color:#e2e8f0;">Why $1.25M:</strong> The original $1M target assumed clean execution. 2025 bookings eroded ~27% (from ~$450K to $327K) due to deal slippage, losses, and margin cuts. Applying the same risk factor to the target means aiming at $1.25M to actually land at $1M. The gap to $1.25M is $692K from deals not yet in the funnel.
-    </div>
-    <div class="chart-wrap" style="height:280px;"><canvas id="cumulativeChart"></canvas></div>
-    <div class="toggle-row">
-      <button class="tog-btn active-actual" id="btn-actual"   onclick="setCumView('actual')">Actual</button>
-      <button class="tog-btn" id="btn-expected" onclick="setCumView('expected')">Expected</button>
-      <button class="tog-btn" id="btn-full"     onclick="setCumView('full')">Full Pipeline</button>
-    </div>
+<!-- ════════════════════════════════════════
+     TAB 3: POINTS SUMMARY
+════════════════════════════════════════ -->
+<div id="tab-points" class="tab-panel">
+  <div class="points-grid" id="points-grid"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 4: RETURN ON SPEND
+════════════════════════════════════════ -->
+<div id="tab-value" class="tab-panel">
+  <div style="padding:20px 40px 0;background:white;border-bottom:1px solid #e5e5e7;">
+    <p style="font-size:13px;color:#6e6e73;line-height:1.6;max-width:700px;">
+      How to read this: each row shows a card + category, the earn rate, the estimated value per point (cpp = cents per point), and the <strong>effective return on spend</strong> — what percentage of each dollar you're getting back in points value. Based on conservative transfer valuations, not portal redemptions.
+    </p>
   </div>
-
-  <!-- Monthly revenue + expenses -->
-  <div class="card section">
-    <div class="card-title">Monthly Revenue vs Expenses — 2026</div>
-    <div class="chart-wrap" style="height:260px;"><canvas id="monthlyChart"></canvas></div>
-  </div>
-
-  <!-- Deal type + funnel -->
-  <div class="grid col2 section">
-    <div class="card">
-      <div class="card-title">Gross Pipeline by Deal Type</div>
-      <div class="chart-wrap" style="height:220px;"><canvas id="typeChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Pipeline Funnel — Gross vs Expected by Stage</div>
-      <div class="chart-wrap" style="height:220px;overflow:hidden;"><canvas id="funnelChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Open deals table -->
-  <div class="card section">
-    <div class="card-title">Open Deals — Implementation & In Progress</div>
-    <table class="deal-table">
-      <thead><tr>
-        <th>Deal</th><th>Type</th><th>Stage</th><th>Deal $</th><th>Close %</th><th>Exp $</th><th>Close</th><th>Conviction</th>
-      </tr></thead>
-      <tbody id="dealTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- Insights -->
-  <div class="grid col2 section">
-    <div>
-      <div class="insight"><div class="lbl">Revenue Ramp</div><strong>Won-Active revenue declines through Q1.</strong> Jan starts at $35K dropping to $26K by Mar as older deals wind down. New pipeline needs to convert to maintain run rate — total revenue doesn't stabilise above $50K until Aug.</div>
-      <div class="insight"><div class="lbl">Concentration Risk</div><strong>Equip Foods / Lineage ($135K) is 41% of Won-Active deal value.</strong> HULKEN DTC ($130K, 60%) is the single most important deal to close — it alone adds $6.5K/mo.</div>
-      <div class="insight"><div class="lbl">Deal Type Mix</div><strong>3PL is the biggest gross opportunity but most is In Progress or Interested.</strong> Shipping has $892K gross but Bikes Online ($480K, 10%) inflates it — strip that and real shipping pipeline is $412K. Consulting ($130K) has highest expected/gross ratio at 92%.</div>
-    </div>
-    <div>
-      <div class="insight"><div class="lbl">Conversion Window</div><strong>Most pipeline closes Q2–Q3 2026.</strong> Jun–Sep is when the majority of In Progress deals are expected to convert. If Hulken DTC, Flaus, and Shameless Snacks convert, monthly revenue could hit $55–65K sustainably.</div>
-      <div class="insight"><div class="lbl">High-Conviction Deals</div><strong>Flaus 3PL (75%), Create (90%), Martie Consulting (85%), Equip Packaging (80%)</strong> are the most defensible open deals. Combined expected: ~$73K. These should close without major effort.</div>
-      <div class="insight"><div class="lbl">Biggest Swing Deals</div><strong>HULKEN DTC ($130K @ 60%) and Shameless Snacks ($160K @ 20%)</strong> are the two highest-value deals. Shameless at 20% — if confidence grows, the deal size justifies significant time investment.</div>
-    </div>
-  </div>
-
-</div><!-- end info tab -->
-
-<!-- ═══════════════════════════════════════════════════════ GROWTH PLAN TAB -->
-<div id="tab-growth" class="page">
-
-  <!-- Gap summary strip -->
-  <div class="grid col3 section">
-    <div class="card" style="border-left:3px solid #f87171;border-radius:0 12px 12px 0;">
-      <div class="card-title red">Revenue Gap (Expected basis)</div>
-      <div class="stat-val red">$818K</div>
-      <div class="stat-sub">$432K expected vs $1.25M target</div>
-    </div>
-    <div class="card" style="border-left:3px solid #f59e0b;border-radius:0 12px 12px 0;">
-      <div class="card-title" style="color:#f59e0b;">Gap Even If All Deals Close</div>
-      <div class="stat-val amber">$692K</div>
-      <div class="stat-sub">Must come from deals not yet in funnel</div>
-    </div>
-    <div class="card" style="background:#1a1212;border-color:#3a1a1a;">
-      <div class="card-title red">Weeks to Aug 31</div>
-      <div class="stat-val red">24 weeks</div>
-      <div class="stat-sub">Target $1.25M to land at $1M after ~25% pipeline risk</div>
-    </div>
-  </div>
-
-  <!-- Backward funnel -->
-  <div class="card section">
-    <div class="card-title">Backward Funnel — What It Takes to Close the Gap</div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:16px;">Starting from the $692K gap (risk-adjusted target of $1.25M minus $558K full pipeline ceiling), working backwards to required top-of-funnel volume. Based on avg deal value of $45K and realistic conversion rates.</div>
-    <div id="backwardFunnel"></div>
-    <div style="margin-top:16px;padding:12px 14px;background:#1e2433;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.7;">
-      <strong style="color:#f87171;">The number that matters:</strong> To close $692K from deals not yet in the funnel, you need roughly <strong style="color:#fff;">550–650 targeted outreach touches</strong> — assuming warm-ish leads (LinkedIn DMs to qualified DTC founders) at a 28% response rate, 60% call-book rate, and 40% close from proposal. Warm referrals close at 5–10× higher rates but can't reach this volume alone. The case for LinkedIn cold DMs starting immediately is decisive.
-    </div>
-  </div>
-
-  <!-- Deadline timeline -->
-  <div class="card section">
-    <div class="card-title">Deal Type Close Windows — How Much Time Is Left</div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:20px;">Last date to start a <em>first conversation</em> for revenue to land in 2026. Assumes typical close cycle per deal type.</div>
-    <div id="timelineViz"></div>
-  </div>
-
-  <!-- Channel breakdown -->
-  <div class="card section">
-    <div class="card-title">Growth Channels — Required vs Current Activity</div>
-    <div style="display:grid;grid-template-columns:180px 80px 100px 90px 80px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #252d3d;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;">
-      <div>Channel</div><div>Status</div><div>Est. Deals/Qtr</div><div>Close Rate</div><div>Weekly Ask</div><div>Notes</div>
-    </div>
-    <div id="channelTable"></div>
-  </div>
-
-  <!-- Weekly pace -->
-  <div class="card section">
-    <div class="card-title">Weekly Activity Targets — What "On Pace" Looks Like</div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:16px;">To close $692K in new deals by Aug 31 (risk-adjusted target), this is the minimum weekly activity across channels. Log actuals each week to know if you're in the game.</div>
-    <div class="chart-wrap" style="height:220px;"><canvas id="paceChart"></canvas></div>
-    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="paceCards"></div>
-  </div>
-
-  <!-- Aug deadline callout -->
-  <div class="card section" style="background:#1a1212;border-color:#3a1a1a;">
-    <div class="card-title red">Revenue by August 31 — Deadline View</div>
-    <div class="grid col3" style="margin-bottom:14px;margin-top:4px;">
-      <div style="background:#1e2433;border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Actual by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;color:#60a5fa;">$227K</div>
-        <div style="font-size:11px;color:#64748b;">100% closed deals · locked in</div>
-        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:23%;height:6px;border-radius:4px;background:#2563eb;"></div></div>
-      </div>
-      <div style="background:#1e2433;border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Expected by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;color:#fbbf24;">$278K</div>
-        <div style="font-size:11px;color:#64748b;">Probability-weighted · 22% of $1.25M</div>
-        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:22%;height:6px;border-radius:4px;background:#f59e0b;"></div></div>
-      </div>
-      <div style="background:#1e2433;border-radius:8px;padding:12px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">Full Pipeline by Aug 31</div>
-        <div style="font-size:22px;font-weight:700;color:#f87171;">$318K</div>
-        <div style="font-size:11px;color:#64748b;">Best case · 25% of $1.25M goal</div>
-        <div style="background:#252d3d;border-radius:4px;height:6px;margin-top:8px;"><div style="width:25%;height:6px;border-radius:4px;background:#f87171;"></div></div>
-      </div>
-    </div>
-    <div style="background:#2a1a1a;border-left:3px solid #f87171;border-radius:0 8px 8px 0;padding:12px 14px;font-size:12px;color:#94a3b8;line-height:1.7;">
-      <strong style="color:#f87171;">The gap cannot be closed by converting existing pipeline.</strong> Even in the best case (all current deals close), only $318K lands by Aug 31 — against a ~$850K need to reach $1.25M by year-end. The remaining ~$530K must come from deals not yet in the funnel, found and closed in the next 60–90 days. <strong style="color:#e2e8f0;">Won-Active deals continue paying out through year-end regardless — this deadline applies only to new closes.</strong>
-    </div>
-  </div>
-
-</div><!-- end growth tab -->
+  <div style="padding:24px 40px 40px;" id="value-grid"></div>
+</div>
 
 <script>
-// ── Tab switching ─────────────────────────────────────────────────
-function showTab(tab) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+/* ─── Tab switching ─── */
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
 }
 
-// ── Data ─────────────────────────────────────────────────────────
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// Three-tier cumulative (from Excel)
-const actualCum   = [35223,  66889,  92555,  119471, 146387, 173303, 200219, 227052, 253885, 278801, 302654, 326506];
-const expectedCum = [35223,  66889,  92555,  127519, 162507, 200422, 239230, 278475, 318909, 357425, 394878, 432340];
-const fullCum     = [35223,  66889,  92555,  128871, 165437, 210191, 261853, 317985, 380035, 440167, 499237, 558390];
-const expectedIncr = expectedCum.map((v,i) => Math.max(0, v - actualCum[i]));
-const fullIncr     = fullCum.map((v,i) => Math.max(0, v - expectedCum[i]));
-
-// Monthly revenue (full pipeline) and expenses
-const revenueMonthly = [35223, 31666, 25666, 36316, 36316, 44254, 44545, 50166, 54124, 52208, 51144, 51228];
-const expenseMonthly = [28875, 29875, 35275, 36185, 39689, 36394, 37567, 37678, 38826, 37778, 37752, 42754];
-const wonData =  [32723, 23499, 17499, 18749, 18749, 18749, 18749, 18666, 18666, 18416, 17353, 17353];
-const implData = [2500,  8167,  8167,  13317, 13317, 16667, 16667, 17917, 19542, 17875, 17875, 17875];
-const progData = [0,     0,     0,     4250,  4250,  8838,  9129,  13583, 15917, 15917, 15917, 16000];
-
-const deadlineIdx = 7;
-let cumView = 'actual';
-
-// ── Chart defaults ────────────────────────────────────────────────
-const darkScales = {
-  x: { grid: { color: '#1e2433' }, ticks: { color: '#64748b', font: { size: 11 } } },
-  y: { grid: { color: '#1e2433' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } }
-};
-
-// ── Register overlay plugin ───────────────────────────────────────
-Chart.register({
-  id: 'overlayLines',
-  afterDraw(chart) {
-    if (chart.canvas.id !== 'cumulativeChart') return;
-    const ctx = chart.ctx;
-    const xScale = chart.scales.x;
-    const yScale = chart.scales.y;
-    const left = xScale.left, right = xScale.right;
-    ctx.save();
-
-    // $1.25M goal line
-    const goalY = yScale.getPixelForValue(1250000);
-    ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5; ctx.setLineDash([7,4]);
-    ctx.beginPath(); ctx.moveTo(left, goalY); ctx.lineTo(right - 32, goalY); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = 'bold 10px -apple-system,sans-serif';
-    ctx.fillText('$1.25M target', left + 6, goalY - 5);
-
-    // Pipeline ceiling line
-    const ceilY = yScale.getPixelForValue(558390);
-    ctx.strokeStyle = 'rgba(148,163,184,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
-    ctx.beginPath(); ctx.moveTo(left, ceilY); ctx.lineTo(right - 32, ceilY); ctx.stroke();
-    ctx.fillStyle = 'rgba(148,163,184,0.85)'; ctx.font = 'bold 10px -apple-system,sans-serif';
-    ctx.fillText('Pipeline ceiling $558K', left + 6, ceilY - 5);
-
-    // Gap bracket
-    const bx = right - 14, ah = 6;
-    ctx.strokeStyle = '#f87171'; ctx.fillStyle = '#f87171'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
-    ctx.beginPath(); ctx.moveTo(bx, ceilY); ctx.lineTo(bx, goalY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx-5,ceilY); ctx.lineTo(bx+5,ceilY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx-5,goalY); ctx.lineTo(bx+5,goalY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx,goalY+1); ctx.lineTo(bx-ah,goalY+ah+3); ctx.lineTo(bx+ah,goalY+ah+3); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(bx,ceilY-1); ctx.lineTo(bx-ah,ceilY-ah-3); ctx.lineTo(bx+ah,ceilY-ah-3); ctx.closePath(); ctx.fill();
-    const midY = (ceilY + goalY) / 2;
-    ctx.font = 'bold 10px -apple-system,sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText('$692K gap', bx - 8, midY + 4); ctx.textAlign = 'left';
-
-    // Aug 31 deadline
-    const deadlineX = (xScale.getPixelForValue(7) + xScale.getPixelForValue(8)) / 2;
-    ctx.strokeStyle = '#f87171'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(deadlineX, yScale.top); ctx.lineTo(deadlineX, yScale.bottom); ctx.stroke();
-    ctx.fillStyle = '#f87171'; ctx.font = 'bold 10px -apple-system,sans-serif';
-    ctx.fillText('Aug 31 deadline', deadlineX + 5, yScale.top + 14);
-    ctx.restore();
-  }
-});
-
-// Cumulative data label plugin
-Chart.register({
-  id: 'cumLabels',
-  afterDatasetsDraw(chart) {
-    if (chart.canvas.id !== 'cumulativeChart') return;
-    const ctx = chart.ctx;
-    const src = cumView === 'actual' ? actualCum : cumView === 'expected' ? expectedCum : fullCum;
-    chart.getDatasetMeta(0).data.forEach((bar, i) => {
-      const val = src[i];
-      const y = chart.scales.y.getPixelForValue(val);
-      ctx.save();
-      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('$' + (val/1000).toFixed(0) + 'K', bar.x, y - 5);
-      ctx.restore();
-    });
-  }
-});
-
-// ── Cumulative chart ──────────────────────────────────────────────
-const cumChart = new Chart(document.getElementById('cumulativeChart'), {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      { label: 'Actual (100% closed)', data: actualCum, backgroundColor: 'rgba(37,99,235,0.85)', borderColor: '#2563eb', borderWidth: 1, stack: 'r', order: 2 },
-      { label: 'Expected (prob-weighted)', data: expectedIncr, backgroundColor: 'rgba(251,191,36,0.7)', borderColor: '#f59e0b', borderWidth: 1, stack: 'r', order: 2 },
-      { label: 'Full pipeline', data: fullIncr, backgroundColor: 'rgba(148,163,184,0.25)', borderColor: 'rgba(148,163,184,0.4)', borderWidth: 1, stack: 'r', order: 2 },
+/* ══════════════════════════════════════════
+   TAB 1 DATA — PERKS & CREDITS
+══════════════════════════════════════════ */
+const cards = [
+  {
+    id: 'amex-plat', name: 'Amex Platinum', owner: 'yan', last4: '82006',
+    fee: 895, renewal: 'Mar 7', status: 'keep', points: '192k MR',
+    perks: [
+      { tier: 'auto',    name: '$200 Uber Cash',           value: 200, confirmed: true,  desc: 'Auto-loads $15/mo ($35 Dec) to Yan\'s Uber. Verified firing.' },
+      { tier: 'auto',    name: '$120 Uber One',            value: 120, confirmed: true,  desc: 'Monthly credit at $9.99/mo. Moved from Chase Oct 2025 — correctly zeroing out.' },
+      { tier: 'auto',    name: 'Walmart+ ~$155',           value: 155, confirmed: true,  desc: 'Firing every month. Verified Jan 2025–Feb 2026.' },
+      { tier: 'auto',    name: '$240 Digital Entertainment',value: 240, confirmed: true,  desc: '~$25/mo firing. YouTube Premium, NYT, etc. Verified.' },
+      { tier: 'auto',    name: '$189 CLEAR Plus',          value: 189, confirmed: true,  desc: '$169 earned so far in 2026. Verified on this card.' },
+      { tier: 'worth',   name: '$200 Airline Fee Credit',  value: 200, confirmed: false, desc: 'Only $8 earned in 2026. Buy United TravelBank at united.com — 5 min, full $200 back.' },
+      { tier: 'worth',   name: '$600 Hotel Credit',        value: 600, confirmed: false, desc: '$0 earned H1 2026. Book via Amex Travel for $300 H1 credit. H2 available Jul 1.' },
+      { tier: 'worth',   name: '$400 Resy Credit',         value: 400, confirmed: false, desc: 'Q1 $100 expires Mar 31 — book a Resy restaurant this week. Q3 used in 2025.' },
+      { tier: 'worth',   name: '$100 Saks Credit',         value: 100, confirmed: false, desc: 'H1 $50 available now. H2 $50 used Dec 2025. Buy anything at saks.com before Jun 30.' },
+      { tier: 'worth',   name: '$200 Oura Ring Credit',    value: 200, confirmed: false, desc: 'Two 2025 rings don\'t qualify — new 2026 benefit requires a 2026 purchase + enrollment.' },
+      { tier: 'worth',   name: '$300 Lululemon',           value: 300, confirmed: false, desc: 'You use Lululemon and it shows enrolled — but $0 credited. Call Amex to resolve.' },
+      { tier: 'passive', name: 'Centurion + Delta SkyClub',value: 0,   confirmed: true,  desc: 'Centurion unlimited. SkyClub capped 10 visits/yr — save for long-haul. Just show up.' },
+      { tier: 'skip',    name: '$300 Equinox',             value: 300, confirmed: null,  desc: 'Not using Equinox. Could gift — friend pays with your card, you get $300 back.' },
     ]
   },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
-      tooltip: { callbacks: { label: ctx => {
-        const i = ctx.dataIndex;
-        if (ctx.datasetIndex === 0) return ` Actual: $${(actualCum[i]/1000).toFixed(0)}K`;
-        if (ctx.datasetIndex === 1) return ` Expected total: $${(expectedCum[i]/1000).toFixed(0)}K`;
-        return ` Full pipeline total: $${(fullCum[i]/1000).toFixed(0)}K`;
-      }}}
-    },
-    scales: {
-      x: { ...darkScales.x, stacked: true },
-      y: { ...darkScales.y, stacked: true, max: 1400000 }
-    }
-  }
-});
+  {
+    id: 'sonam-csr', name: 'Chase Sapphire Reserve', owner: 'sonam', last4: '3033',
+    fee: 795, renewal: 'Oct 1 (first at $795)', status: 'keep', points: '327k UR',
+    perks: [
+      { tier: 'auto',    name: '$300 Travel Credit',           value: 300, confirmed: true,  desc: 'Auto-reimburses first $300 in travel. Resets at renewal.' },
+      { tier: 'auto',    name: '$120 Lyft Credit',             value: 120, confirmed: true,  desc: '$10/mo auto-applies in Lyft. All Lyft on Sonam\'s CSR — confirmed firing.' },
+      { tier: 'worth',   name: 'StubHub $300',                 value: 300, confirmed: true,  desc: '$150 Jan–Jun + $150 Jul–Dec. H1 2026 $150 claimed Jan 18. ✅' },
+      { tier: 'worth',   name: '$500 "The Edit" Hotel Credit', value: 500, confirmed: false, desc: 'Two $250 credits on 2-night+ prepaid stays via Chase Travel.' },
+      { tier: 'worth',   name: '$250 Chase Travel Hotel Credit',value: 250,confirmed: false, desc: 'One-time at IHG, Omni, Montage, Pendry, Virgin, Minor, Pan Pacific. Valid Dec 31, 2026.' },
+      { tier: 'worth',   name: '$60 DoorDash Credit',          value: 60,  confirmed: true,  desc: '$5/mo auto-applies. Heavy DoorDash usage confirmed — credit firing.' },
+      { tier: 'worth',   name: '$300 Sapphire Dining Credit',  value: 300, confirmed: true,  desc: 'Used Dec 30 via gift cards. $300 real value — use for dining going forward.' },
+      { tier: 'passive', name: 'IHG Platinum Elite Status',    value: 0,   confirmed: true,  desc: 'Automatic through Dec 2027. Nothing to do.' },
+      { tier: 'passive', name: 'Primary Rental Car Insurance', value: 0,   confirmed: true,  desc: 'Up to $75k primary coverage. Use this card when renting.' },
+      { tier: 'passive', name: 'Trip + Medical Insurance',     value: 0,   confirmed: true,  desc: '$10k/traveler cancellation, $500 delay, $100k medical evac. Book travel on this card.' },
+      { tier: 'passive', name: 'Priority Pass + Sapphire Lounges',value:0, confirmed: true,  desc: 'Unlimited access + 2 guests at Chase Sapphire lounges. Just show the card.' },
+      { tier: 'skip',    name: 'Instacart Credit',             value: 0,   confirmed: null,  desc: 'Requires $99/yr Instacart+. Net only ~$81. Skip.' },
+      { tier: 'skip',    name: 'Peloton Credit',               value: 0,   confirmed: null,  desc: 'Not a member. Skip.' },
+    ]
+  },
+  {
+    id: 'sonam-biz-gold', name: 'Amex Business Gold', owner: 'sonam', last4: '51007',
+    fee: 375, renewal: 'May 22', status: 'keep', points: '414k MR (incl. Biz Plat)',
+    perks: [
+      { tier: 'auto', name: '4x Software + Electronics',   value: 632, confirmed: false, desc: '$8,455/yr software spend should route here. Most currently misrouted to Chase Biz Unlimited. Switch billing now.' },
+      { tier: 'auto', name: '4x Dining',                   value: 492, confirmed: true,  desc: 'All US dining, takeout, coffee. Confirmed on this card.' },
+      { tier: 'auto', name: '$150 Squarespace Credit',     value: 150, confirmed: true,  desc: 'Annual payment already on this card. Verified Dec 2025.' },
+      { tier: 'auto', name: '$240 Flexible Business Credit',value:240, confirmed: false, desc: '$20/mo at Grubhub, FedEx, or office supply. Set up Grubhub+ autopay or move to skip.' },
+    ]
+  },
+  {
+    id: 'sonam-venturex', name: 'Cap One Venture X', owner: 'sonam', last4: '7484',
+    fee: 395, renewal: 'Mar 11', status: 'keep', points: '143k C1 miles',
+    perks: [
+      { tier: 'auto',    name: '$300 Travel Credit',        value: 300, confirmed: true, desc: 'Book via CapOne Travel portal. Renewed Mar 11 — fresh credit available.' },
+      { tier: 'auto',    name: '10k Anniversary Miles ~$150',value: 150,confirmed: true, desc: 'Auto-deposits at renewal. Just refreshed Mar 11.' },
+      { tier: 'auto',    name: '2x on Everything',          value: 0,   confirmed: true, desc: 'Catch-all for groceries, medical, general retail.' },
+      { tier: 'passive', name: 'Priority Pass + C1 Lounges',value: 0,   confirmed: true, desc: 'Unlimited cardholder access. Guest access now costs extra (Feb 2026). Just show up.' },
+      { tier: 'passive', name: 'Cell Phone Protection $800',value: 0,   confirmed: true, desc: 'Coverage automatic when T-Mobile autopays here.' },
+      { tier: 'passive', name: 'Hertz President\'s Circle', value: 0,   confirmed: true, desc: 'Activated on Yan\'s Hertz account. Best tier. Just show up at the counter.' },
+    ]
+  },
+  {
+    id: 'sonam-ink-preferred', name: 'Chase Ink Biz Preferred', owner: 'sonam', last4: '726',
+    fee: 95, renewal: 'Oct 1', status: 'keep',
+    perks: [
+      { tier: 'auto', name: '3x Shipping',     value: 0, confirmed: true, desc: 'UPS, FedEx, USPS. Route all OC shipping here.' },
+      { tier: 'auto', name: '3x Advertising',  value: 0, confirmed: true, desc: 'Online/social ads for Operating Crew or Streetlife.' },
+    ]
+  },
+  {
+    id: 'sonam-ink-cash', name: 'Chase Ink Biz Cash', owner: 'sonam', last4: '830',
+    fee: 0, renewal: '—', status: 'keep',
+    perks: [
+      { tier: 'auto', name: '5x Internet/Cable/Phone', value: 0, confirmed: true, desc: 'Spectrum autopay here. T-Mobile moving here from Biz Plat before cancellation.' },
+    ]
+  },
+  {
+    id: 'sonam-bilt', name: 'BILT Rewards', owner: 'sonam', last4: '6200',
+    fee: 0, renewal: '—', status: 'keep', points: '72k BILT',
+    perks: [
+      { tier: 'auto',    name: '72k Points → Hyatt',        value: 1400, confirmed: true, desc: 'Transfer 1:1 to World of Hyatt (~2cpp). Best use of existing balance.' },
+      { tier: 'passive', name: 'Phone + Trip Insurance',    value: 0,    confirmed: true, desc: '$800 phone protection, trip delay >6hr, primary rental car insurance. Just use the card.' },
+      { tier: 'skip',    name: 'Rent Points Optimization',  value: 0,    confirmed: null, desc: 'At $6,300/mo rent, only ~$189/yr net after opportunity cost. Not worth the friction.' },
+    ]
+  },
+  {
+    id: 'sonam-freedom', name: 'Chase Freedom Flex', owner: 'sonam', last4: '2869',
+    fee: 0, renewal: '—', status: 'keep',
+    perks: [
+      { tier: 'worth', name: '5x Dining Q1 2026', value: 0, confirmed: true, desc: 'Q1 2026 category — use through Mar 31, then swap back to Biz Gold.' },
+    ]
+  },
+  {
+    id: 'yan-amazon', name: 'Amazon Visa', owner: 'yan', last4: '4316',
+    fee: 0, renewal: '—', status: 'keep',
+    perks: [
+      { tier: 'auto', name: '5% Amazon + Whole Foods', value: 0, confirmed: true, desc: '$10,104 on Amazon in 2025. Already correctly routed.' },
+    ]
+  },
+  {
+    id: 'yan-ink-cash', name: 'Chase Ink Biz Cash', owner: 'yan', last4: '4093',
+    fee: 0, renewal: '—', status: 'keep',
+    perks: [
+      { tier: 'auto', name: '5x Office Supplies', value: 0, confirmed: true, desc: 'Staples, Office Depot. Keep autopays here.' },
+    ]
+  },
+  {
+    id: 'yan-biz-plat', name: 'Amex Biz Platinum', owner: 'yan', last4: '31007',
+    fee: 895, renewal: 'Apr 8 — CANCEL BY MAY 8', status: 'cancel', points: '414k MR → transfers to Plat',
+    perks: [
+      { tier: 'urgent', name: 'Airline Fee $200 — USE NOW',  value: 200, confirmed: false, desc: '$0 used in 2026. Buy United TravelBank at united.com before canceling. 5 min.' },
+      { tier: 'urgent', name: 'Dell Credit $150 — USE NOW',  value: 150, confirmed: false, desc: '$0 used in 2026. Any OC tech purchases? Do it on this card before canceling.' },
+      { tier: 'urgent', name: 'Move T-Mobile billing',       value: 0,   confirmed: false, desc: 'T-Mobile currently autopays here. Move to Ink Biz Cash (830) for 5x before canceling.' },
+      { tier: 'skip',   name: 'Adobe $250',                  value: 0,   confirmed: null,  desc: 'Not using Adobe. Skip.' },
+      { tier: 'skip',   name: 'Indeed Credit',               value: 0,   confirmed: null,  desc: 'Not using Indeed. Skip.' },
+      { tier: 'skip',   name: '$600 Hotel Credit',           value: 0,   confirmed: null,  desc: 'Canceling card — not worth booking around.' },
+    ]
+  },
+  {
+    id: 'yan-green', name: 'Amex Green Card', owner: 'yan', last4: '41001',
+    fee: 150, renewal: 'Aug 21 — CANCEL SOON', status: 'cancel',
+    perks: [
+      { tier: 'urgent', name: 'Cancel — stop Aug charge',    value: 150, confirmed: false, desc: '30-day window closed (renewed Aug 21 2025). Cancel now to avoid $150 in Aug 2026.' },
+      { tier: 'worth',  name: 'LoungeBuddy $100',            value: 100, confirmed: false, desc: 'If a flight is coming up, buy a lounge pass in LoungeBuddy app on this card first.' },
+    ]
+  },
+  {
+    id: 'yan-csr', name: 'Chase Sapphire Reserve', owner: 'yan', last4: '4094',
+    fee: 795, renewal: 'Sep 1 — DOWNGRADE', status: 'downgrade',
+    perks: [
+      { tier: 'urgent', name: 'Downgrade before Sep 1',  value: 795, confirmed: false, desc: 'Call Chase in Aug 2026. Product change to Freedom Flex. Saves $795, keeps UR points.' },
+      { tier: 'worth',  name: 'StubHub $300',            value: 300, confirmed: true,  desc: '$150 Jan–Jun + $150 Jul–Dec. H1 2026 $150 claimed Jan 18. H2 available Jul 1.' },
+      { tier: 'worth',  name: '$300 Travel Credit',      value: 300, confirmed: true,  desc: 'Auto-reimburses travel. Fully used in 2025.' },
+      { tier: 'worth',  name: '$60 DoorDash Credit',     value: 60,  confirmed: true,  desc: '$5/mo on DoorDash. Firing — heavy usage confirmed on this card.' },
+    ]
+  },
+];
 
-function setCumView(view) {
-  cumView = view;
-  document.querySelectorAll('.tog-btn').forEach(b => { b.className = 'tog-btn'; });
-  document.getElementById('btn-' + view).className = 'tog-btn active-' + view;
-  cumChart.update();
+// Multi-select filter state — both owners on, all tiers on except skip
+const activeOwners = new Set(['yan', 'sonam']);
+const activeTiers  = new Set(['urgent', 'auto', 'worth', 'passive']);
+
+function toggleOwner(owner) {
+  // Always keep at least one owner active
+  if (activeOwners.has(owner) && activeOwners.size === 1) return;
+  if (activeOwners.has(owner)) activeOwners.delete(owner);
+  else activeOwners.add(owner);
+  document.getElementById('btn-' + owner).classList.toggle('active', activeOwners.has(owner));
+  renderPerks();
 }
 
-// ── Monthly revenue + expenses chart ─────────────────────────────
-new Chart(document.getElementById('monthlyChart'), {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      { label: '4/Won-Active', data: wonData, backgroundColor: '#2563eb', stack: 'rev', order: 2 },
-      { label: '3/Implementation', data: implData, backgroundColor: '#7c3aed', stack: 'rev', order: 2 },
-      { label: '2/In Progress', data: progData, backgroundColor: '#0891b2', stack: 'rev', order: 2 },
-      { label: 'Total Expenses', data: expenseMonthly, type: 'line', borderColor: '#f87171', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4,2], pointRadius: 3, pointBackgroundColor: '#f87171', fill: false, order: 1 },
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } } },
-    scales: {
-      x: { ...darkScales.x, stacked: true },
-      y: { ...darkScales.y, stacked: false }
-    }
-  },
-  plugins: [{
-    id: 'monthlyLabels',
-    afterDatasetsDraw(chart) {
-      const ctx = chart.ctx;
-      chart.getDatasetMeta(2).data.forEach((bar, i) => {
-        const total = wonData[i] + implData[i] + progData[i];
-        if (!total) return;
-        ctx.save(); ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('$' + (total/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
+function toggleTier(tier) {
+  // Always keep at least one tier active
+  if (activeTiers.has(tier) && activeTiers.size === 1) return;
+  if (activeTiers.has(tier)) activeTiers.delete(tier);
+  else activeTiers.add(tier);
+  document.getElementById('btn-' + tier).classList.toggle('active', activeTiers.has(tier));
+  renderPerks();
+}
+
+function renderPerks() {
+  const grid = document.getElementById('perks-grid');
+  grid.innerHTML = '';
+  let totalAuto = 0, totalWorth = 0, totalFees = 0;
+
+  cards.forEach(card => {
+    if (!activeOwners.has(card.owner)) return;
+    let perksToShow = card.perks.filter(p => activeTiers.has(p.tier));
+    if (!perksToShow.length) return;
+
+    const autoPerks    = perksToShow.filter(p => p.tier === 'auto');
+    const worthPerks   = perksToShow.filter(p => p.tier === 'worth');
+    const passivePerks = perksToShow.filter(p => p.tier === 'passive');
+    const skipPerks    = perksToShow.filter(p => p.tier === 'skip');
+    const urgentPerks  = perksToShow.filter(p => p.tier === 'urgent');
+
+    const cardAutoVal  = card.perks.filter(p => p.tier === 'auto').reduce((s,p) => s+p.value, 0);
+    const cardWorthVal = card.perks.filter(p => p.tier === 'worth').reduce((s,p) => s+p.value, 0);
+    if (card.status === 'keep') { totalFees += card.fee; totalAuto += cardAutoVal; totalWorth += cardWorthVal; }
+
+    const el = document.createElement('div');
+    el.className = `card${card.status === 'cancel' ? ' is-cancel' : card.status === 'downgrade' ? ' is-downgrade' : ''}`;
+
+    const ownerClass  = card.owner === 'yan' ? 'badge-owner-yan' : 'badge-owner-sonam';
+    const ownerLabel  = card.owner === 'yan' ? 'Yan' : 'Sonam';
+    const feeLabel    = card.fee > 0 ? `$${card.fee}/yr` : 'No fee';
+    let statusBadge   = '';
+    if (card.status === 'cancel')    statusBadge = '<span class="badge badge-cancel">🔴 CANCEL</span>';
+    if (card.status === 'downgrade') statusBadge = '<span class="badge badge-downgrade">📉 DOWNGRADE</span>';
+
+    function renderGroup(perks, tier) {
+      if (!perks.length) return '';
+      const labels = { auto: '🟢 Automatic', worth: '🔵 Worth It', passive: '🟣 Just There', skip: '⚫ Skip', urgent: '🔴 Do This First' };
+      let html = `<div class="tier-label ${tier}">${labels[tier]}</div>`;
+      perks.forEach(p => {
+        const val = p.value > 0 ? `+$${p.value}` : '';
+        const tag = p.confirmed === true
+          ? '<span class="perk-confirmed">VERIFIED ✓</span>'
+          : p.confirmed === false && p.tier !== 'skip' && p.tier !== 'passive'
+          ? '<span class="perk-missing">CHECK</span>' : '';
+        html += `<div class="perk-item${p.confirmed === true ? ' confirmed' : ''}">
+          <div class="perk-dot ${p.tier}"></div>
+          <div class="perk-content">
+            <div class="perk-name">${p.name} ${tag}</div>
+            <div class="perk-desc">${p.desc}</div>
+          </div>
+          ${val ? `<div class="perk-value ${p.tier}">${val}</div>` : ''}
+        </div>`;
       });
+      return html;
     }
-  }]
-});
 
-// ── Deal type doughnut ────────────────────────────────────────────
-new Chart(document.getElementById('typeChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['🏭 3PL', '🚚 Shipping', '📦 Packaging', '💳 Consulting'],
-    datasets: [{ data: [969700, 892000, 418292, 130113], backgroundColor: ['#2563eb','#059669','#7c3aed','#d97706'], borderWidth: 0, hoverOffset: 8 }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
-      tooltip: { callbacks: { label: ctx => ' $' + (ctx.raw/1000).toFixed(0) + 'K (' + Math.round(ctx.raw/2410105*100) + '%)' } }
-    },
-    cutout: '65%'
-  },
-  plugins: [{
-    id: 'doughnutLabels',
-    afterDatasetsDraw(chart) {
-      const ctx = chart.ctx;
-      const total = 2410105;
-      chart.getDatasetMeta(0).data.forEach((arc, i) => {
-        const val = chart.data.datasets[0].data[i];
-        if (val / total < 0.04) return;
-        const angle = (arc.startAngle + arc.endAngle) / 2;
-        const r = (arc.outerRadius + arc.innerRadius) / 2;
-        ctx.save(); ctx.fillStyle = '#fff'; ctx.font = 'bold 10px -apple-system,sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('$' + (val/1000).toFixed(0) + 'K', arc.x + Math.cos(angle)*r, arc.y + Math.sin(angle)*r);
-        ctx.restore();
-      });
-    }
-  }]
-});
+    const perksHtml = renderGroup(urgentPerks,'urgent') + renderGroup(autoPerks,'auto') + renderGroup(worthPerks,'worth') + renderGroup(passivePerks,'passive') + renderGroup(skipPerks,'skip');
+    const totalValue = cardAutoVal + cardWorthVal;
+    const net = totalValue - card.fee;
+    const netDisplay = net >= 0 ? `Net +$${net.toLocaleString()}` : `Net −$${Math.abs(net).toLocaleString()}`;
+    const netColor = net >= 0 ? '#1a8a3c' : '#d70015';
 
-// ── Funnel chart ──────────────────────────────────────────────────
-new Chart(document.getElementById('funnelChart'), {
-  type: 'bar',
-  data: {
-    labels: ['Won-Active', 'Implement.', 'In Progress', 'Interested'],
-    datasets: [
-      { label: 'Gross $', data: [292105, 360000, 893000, 844000], backgroundColor: '#1e3a5f', maxBarThickness: 32 },
-      { label: 'Expected $', data: [292105, 240800, 209000, 93300], backgroundColor: '#2563eb', maxBarThickness: 32 },
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    layout: { padding: { top: 18 } },
-    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } } },
-    scales: {
-      x: { ...darkScales.x, ticks: { ...darkScales.x.ticks, font: { size: 10 } } },
-      y: { ...darkScales.y }
-    }
-  },
-  plugins: [{
-    id: 'funnelLabels',
-    afterDatasetsDraw(chart) {
-      const ctx = chart.ctx;
-      chart.data.datasets.forEach((ds, di) => {
-        chart.getDatasetMeta(di).data.forEach((bar, i) => {
-          if (!ds.data[i]) return;
-          ctx.save(); ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center';
-          ctx.fillText('$' + (ds.data[i]/1000).toFixed(0) + 'K', bar.x, bar.y - 5); ctx.restore();
-        });
-      });
-    }
-  }]
-});
-
-// ── Deal table ────────────────────────────────────────────────────
-const deals = [
-  { name: 'HULKEN - DTC', type: '3pl', stage: 'Implementation', deal: 130000, pct: 60, close: '2026-06' },
-  { name: 'Shameless Snacks', type: '3pl', stage: 'In Progress', deal: 160000, pct: 20, close: '2026-08' },
-  { name: 'Venus et Fleur', type: 'ship', stage: 'In Progress', deal: 150000, pct: 15, close: '2026-05' },
-  { name: 'Tracksmith', type: '3pl', stage: 'Implementation', deal: 65000, pct: 30, close: '2026-09' },
-  { name: 'Cradlewise Consulting', type: 'cons', stage: 'Implementation', deal: 60000, pct: 100, close: '2026-02' },
-  { name: 'Alex Duong - Packaging', type: 'pkg', stage: 'In Progress', deal: 60000, pct: 25, close: '2026-08' },
-  { name: 'Smalls Packaging', type: 'pkg', stage: 'In Progress', deal: 60000, pct: 5, close: '2026-09' },
-  { name: 'Flaus 3PL', type: '3pl', stage: 'In Progress', deal: 55000, pct: 75, close: '2026-08' },
-  { name: 'BugMD', type: '3pl', stage: 'In Progress', deal: 80000, pct: 20, close: '2026-09' },
-  { name: 'Green Compass', type: 'ship', stage: 'In Progress', deal: 80000, pct: 10, close: '2026-08' },
-  { name: 'Equip Packaging', type: 'pkg', stage: 'Implementation', deal: 30000, pct: 80, close: '2026-04' },
-  { name: 'Pila Energy', type: 'ship', stage: 'Implementation', deal: 30000, pct: 50, close: '2026-08' },
-  { name: 'The Only Bean', type: '3pl', stage: 'In Progress', deal: 30000, pct: 30, close: '2026-09' },
-  { name: 'Martie Packaging', type: 'pkg', stage: 'In Progress', deal: 20000, pct: 70, close: '2026-06' },
-  { name: 'Martie Consulting', type: 'cons', stage: 'In Progress', deal: 20000, pct: 85, close: '2026-04' },
-  { name: 'Foggy Dog', type: 'cons', stage: 'Implementation', deal: 7000, pct: 90, close: '2026-04' },
-  { name: 'Create 3PL', type: '3pl', stage: 'In Progress', deal: 8000, pct: 90, close: '2026-06' },
-  { name: 'Tracksmith Packaging', type: 'pkg', stage: 'In Progress', deal: 5000, pct: 60, close: '2026-08' },
-];
-deals.sort((a,b) => b.deal - a.deal);
-const typeBadge = { '3pl':'badge-3pl','ship':'badge-ship','pkg':'badge-pkg','cons':'badge-cons' };
-const typeLabel = { '3pl':'🏭 3PL','ship':'🚚 Shipping','pkg':'📦 Packaging','cons':'💳 Consulting' };
-const pctColor = p => p >= 75 ? '#4ade80' : p >= 50 ? '#facc15' : p >= 25 ? '#fb923c' : '#f87171';
-const tbody = document.getElementById('dealTableBody');
-deals.forEach(d => {
-  const exp = Math.round(d.deal * d.pct / 100);
-  tbody.innerHTML += `<tr>
-    <td>${d.name}</td>
-    <td><span class="badge ${typeBadge[d.type]}">${typeLabel[d.type]}</span></td>
-    <td style="color:#64748b">${d.stage}</td>
-    <td style="color:#fff;font-weight:600">$${(d.deal/1000).toFixed(0)}K</td>
-    <td><div style="color:${pctColor(d.pct)};font-weight:600">${d.pct}%</div><div class="pct-bar"><div class="pct-fill" style="width:${d.pct}%;background:${pctColor(d.pct)}"></div></div></td>
-    <td style="color:#94a3b8">$${(exp/1000).toFixed(0)}K</td>
-    <td style="color:#64748b">${d.close}</td>
-    <td style="color:${pctColor(d.pct)}">${d.pct>=75?'🟢 High':d.pct>=50?'🟡 Medium':d.pct>=25?'🟠 Low-Med':'🔴 Low'}</td>
-  </tr>`;
-});
-
-// ══════════════════════════════════════════════════════════════════
-// GROWTH PLAN TAB — dynamic content
-// ══════════════════════════════════════════════════════════════════
-
-// ── Backward funnel ───────────────────────────────────────────────
-// Funnel: top = outreach (widest), bottom = revenue gap (narrowest) — classic funnel shape
-const funnelStages = [
-  { label: 'Outreach touches',        value: '~550–650', conv: 'Starting point',              color: '#60a5fa', pct: 100 },
-  { label: 'Warm responses / replies',value: '~165',     conv: '28% response rate',           color: '#4ade80', pct: 28  },
-  { label: 'Qualified intro calls',   value: '~100',     conv: '60% book a call',             color: '#facc15', pct: 16  },
-  { label: 'Proposals / deep convos', value: '~40',      conv: '40% progress to proposal',    color: '#f59e0b', pct: 7   },
-  { label: 'New deals closed',        value: '~15 deals',conv: '40% close rate · avg $45K',   color: '#fb923c', pct: 3   },
-  { label: 'Revenue gap closed',      value: '$692K',    conv: '$1.25M target',               color: '#f87171', pct: 1.5 },
-];
-const funnelEl = document.getElementById('backwardFunnel');
-funnelStages.forEach((s, i) => {
-  // Centered trapezoid shape: margin grows as pct shrinks
-  const margin = ((100 - s.pct) / 2) * 0.72; // max ~36% each side at bottom
-  funnelEl.innerHTML += `
-    <div style="margin: 0 ${margin.toFixed(1)}% 0 ${margin.toFixed(1)}%; background:${s.color}18; border:1px solid ${s.color}44; border-radius:4px; padding:8px 16px; display:flex; align-items:center; justify-content:space-between; transition: margin .3s;">
-      <span style="font-size:12px;font-weight:700;color:${s.color};">${s.value}</span>
-      <span style="font-size:12px;font-weight:600;color:#e2e8f0;">${s.label}</span>
-      <span style="font-size:11px;color:#64748b;">${s.conv}</span>
-    </div>
-    ${i < funnelStages.length - 1 ? `<div style="text-align:center;color:#475569;font-size:13px;line-height:1.2;margin:1px 0;">▼</div>` : ''}
-  `;
-});
-
-// ── Timeline visualization ────────────────────────────────────────
-const timelineData = [
-  { type: '3PL',              closeBy: 'Jun 30',  convBy: 'Apr 30', weeksLeft: 7,  status: 'red',    note: 'Warm leads / referrals: 6–8 week cycle, close by Jun 30. Cold outreach window has passed — only existing relationships have a shot.' },
-  { type: 'Packaging / Shipping', closeBy: 'Jul 15', convBy: 'May 31', weeksLeft: 11, status: 'yellow', note: '6–8 week close cycle. 11 weeks to last first conversation — act in April.' },
-];
-const tlEl = document.getElementById('timelineViz');
-const totalWeeks = 24;
-timelineData.forEach(t => {
-  const fillPct = Math.max(4, (t.weeksLeft / totalWeeks) * 100);
-  const statusColors = { red: '#f87171', yellow: '#facc15', green: '#4ade80' };
-  const col = statusColors[t.status];
-  tlEl.innerHTML += `
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-        <span style="font-size:12px;font-weight:600;color:#e2e8f0;">${t.type}</span>
-        <span style="font-size:11px;color:#64748b;">Close by <strong style="color:${col}">${t.closeBy}</strong> · First convo by <strong style="color:${col}">${t.convBy}</strong></span>
-      </div>
-      <div style="background:#1e2433;border-radius:6px;height:28px;position:relative;overflow:hidden;">
-        <div style="position:absolute;left:0;top:0;width:${fillPct}%;height:100%;background:${col}22;border-right:2px solid ${col};display:flex;align-items:center;padding:0 10px;">
-          <span style="font-size:11px;font-weight:600;color:${col};">${t.weeksLeft === 0 ? '⚠ Window closed' : t.weeksLeft + ' weeks left'}</span>
+    el.innerHTML = `
+      <div class="card-header">
+        <div class="card-name">${card.name}</div>
+        <div class="card-meta">
+          <span class="badge ${ownerClass}">${ownerLabel}</span>
+          <span class="badge badge-last4">···${card.last4}</span>
+          <span class="badge badge-fee">${feeLabel}</span>
+          ${card.renewal !== '—' ? `<span class="badge badge-renewal">↻ ${card.renewal}</span>` : ''}
+          ${card.points ? `<span class="badge badge-points">${card.points}</span>` : ''}
+          ${statusBadge}
         </div>
-        <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#475569;">Aug 31</div>
       </div>
-      <div style="font-size:11px;color:#64748b;margin-top:4px;">${t.note}</div>
-    </div>
-  `;
-});
+      <div class="perks-list">${perksHtml}</div>
+      ${card.fee > 0 || totalValue > 0 ? `<div class="card-total">
+        <span class="card-total-label">Credits vs. $${card.fee} fee</span>
+        <span class="card-total-value" style="color:${netColor}">${netDisplay}</span>
+      </div>` : ''}`;
+    grid.appendChild(el);
+  });
 
-// ── Channel table ─────────────────────────────────────────────────
-const channels = [
-  { name: 'Core Partners (15–20)',      status: 'yellow', dealsQtr: '3–6',  closeRate: '40–60%', weeklyAsk: '4–5 touches/wk', note: 'Monthly cadence. Supply chain consultants, financing cos, marketing agencies, fellow operators. Highest-signal referrals. Need a structured monthly check-in rhythm.' },
-  { name: 'Secondary Partners (~20)',   status: 'yellow', dealsQtr: '1–3',  closeRate: '30–50%', weeklyAsk: '2–3 touches/wk', note: 'Every 2 months. Lower signal but still warm. Don\'t let these go cold — a single deal from each tier justifies the effort.' },
-  { name: 'LinkedIn Cold DMs',          status: 'red',    dealsQtr: '1–3',  closeRate: '5–10%',  weeklyAsk: '30–50 DMs/wk',   note: 'Not started. Highest volume channel available. DTC founders are reachable on LinkedIn. Start immediately — every week of delay is 30–50 fewer touches.' },
-  { name: 'Monthly Newsletter',         status: 'yellow', dealsQtr: '0–2',  closeRate: 'Indirect',weeklyAsk: '1×/month',        note: 'Sent first week of every month to all brands + partners in network. Keeps OC top of mind. Low effort, broad reach. Consistency matters more than perfection.' },
-  { name: 'LinkedIn Content',           status: 'yellow', dealsQtr: '0–1',  closeRate: 'Indirect',weeklyAsk: '1–2 posts/wk',    note: 'Currently ~1 post/week. No direct inbound yet but reinforces credibility with people who already know OC. Compounds over time.' },
-  { name: 'Conferences (3 planned)',    status: 'yellow', dealsQtr: '1–2',  closeRate: '20–35%', weeklyAsk: '1 event/qtr',     note: '3 this year. Great for new relationships and re-activating warm contacts. Follow up within 48h — most conference value is lost by day 3.' },
-  { name: 'Hosted / Attended Dinners', status: 'green',  dealsQtr: '1–2',  closeRate: '25–40%', weeklyAsk: '1–2/month',       note: 'Highest relationship depth per hour. Invest here. The people at your dinners are the ones who refer deals.' },
-];
-const statusLabel = { green: 'Active', yellow: 'Partial', red: 'Not started' };
-const chEl = document.getElementById('channelTable');
-channels.forEach(c => {
-  chEl.innerHTML += `
-    <div style="display:grid;grid-template-columns:180px 80px 100px 90px 80px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #1e2433;font-size:12px;">
-      <div style="font-weight:600;color:#e2e8f0;">${c.name}</div>
-      <div><span class="status-dot dot-${c.status}"></span><span style="color:#94a3b8;font-size:11px;">${statusLabel[c.status]}</span></div>
-      <div style="color:#94a3b8;">${c.dealsQtr}</div>
-      <div style="color:#94a3b8;">${c.closeRate}</div>
-      <div style="background:#1e2433;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;color:#fbbf24;text-align:center;">${c.weeklyAsk}</div>
-      <div style="color:#64748b;font-size:11px;">${c.note}</div>
-    </div>
-  `;
-});
+  document.getElementById('total-fees').textContent = `$${totalFees.toLocaleString()}`;
+  document.getElementById('auto-value').textContent  = `$${totalAuto.toLocaleString()}`;
+  document.getElementById('worth-value').textContent = `$${totalWorth.toLocaleString()}`;
+  document.getElementById('net-value').textContent   = `$${(totalAuto + totalWorth - totalFees).toLocaleString()}`;
+}
 
-// ── Weekly pace chart ─────────────────────────────────────────────
-const paceWeeks = ['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8'];
-const paceTargets = {
-  'LinkedIn DMs':     [35, 35, 40, 40, 45, 45, 50, 50],
-  'Partner Meetings': [1,  1,  1,  1,  1,  1,  1,  1 ],
-  'Referral Asks':    [2,  2,  2,  2,  2,  2,  2,  2 ],
-  'Intro Calls':      [2,  2,  3,  3,  3,  4,  4,  4 ],
+/* ══════════════════════════════════════════
+   TAB 2 — SPEND ROUTING
+══════════════════════════════════════════ */
+function mc(cls, label, logo) {
+  return `<div class="mini-card ${cls}"><div class="shine"></div><div class="chip"></div><div class="logo">${logo}</div><div class="label">${label}</div></div>`;
+}
+
+const CARDS_META = {
+  bizGold:      { cls:'mc-biz-gold',  label:'Biz Gold',   logo:'AMEX', fullName:'Amex Biz Gold',          owner:'Sonam' },
+  amexPlat:     { cls:'mc-amex-plat', label:'Plat',       logo:'AMEX', fullName:'Amex Platinum',           owner:'Yan'   },
+  csr:          { cls:'mc-csr',       label:'Reserve',    logo:'✦',    fullName:'Chase Sapphire Reserve',  owner:'Sonam' },
+  venturex:     { cls:'mc-venturex',  label:'Venture X',  logo:'C1',   fullName:'Cap One Venture X',       owner:'Sonam' },
+  inkCashSonam: { cls:'mc-ink',       label:'Ink Cash',   logo:'✦',    fullName:'Chase Ink Biz Cash (830)',owner:'Sonam' },
+  inkCashYan:   { cls:'mc-ink',       label:'Ink Cash',   logo:'✦',    fullName:'Chase Ink Biz Cash (4093)',owner:'Yan' },
+  inkPreferred: { cls:'mc-ink',       label:'Ink Pref',   logo:'✦',    fullName:'Chase Ink Preferred',     owner:'Sonam' },
+  bilt:         { cls:'mc-bilt',      label:'BILT',       logo:'B',    fullName:'BILT Rewards',            owner:'Sonam' },
+  amazon:       { cls:'mc-amazon',    label:'Amazon',     logo:'▶',    fullName:'Amazon Visa',             owner:'Yan'   },
+  freedom:      { cls:'mc-freedom',   label:'Freedom',    logo:'✦',    fullName:'Chase Freedom Flex',      owner:'Sonam' },
+  bizUnlimited: { cls:'mc-ink',       label:'Biz Unltd',  logo:'✦',    fullName:'Chase Ink Biz Unlimited', owner:'Yan'   },
 };
-new Chart(document.getElementById('paceChart'), {
-  type: 'bar',
-  data: {
-    labels: paceWeeks,
-    datasets: [
-      { label: 'LinkedIn DMs (target)', data: paceTargets['LinkedIn DMs'], backgroundColor: 'rgba(37,99,235,0.6)', stack: 'a' },
-      { label: 'Partner Meetings ×10', data: paceTargets['Partner Meetings'].map(v=>v*10), backgroundColor: 'rgba(5,150,105,0.6)', stack: 'a' },
-      { label: 'Referral Asks ×10',    data: paceTargets['Referral Asks'].map(v=>v*10),    backgroundColor: 'rgba(124,58,237,0.6)', stack: 'a' },
-      { label: 'Intro Calls ×5',       data: paceTargets['Intro Calls'].map(v=>v*5),       backgroundColor: 'rgba(251,191,36,0.6)', stack: 'a' },
+
+const categorySections = [
+  {
+    label: 'Active Decisions',
+    desc: 'You choose where to pay — pick the right card each time',
+    color: '#1d1d1f',
+    cats: [
+      { icon:'💻', title:'Software & SaaS', subtitle:'Notion, Linear, Slack, Superhuman…',
+        options:[ {card:'bizGold',rank:1,rate:'4x MR',earn:4,currency:'MR'}, {card:'bizUnlimited',rank:'avoid',rate:'1.5x UR',earn:1.5,currency:'UR'} ],
+        note:'⚡ Most subscriptions misrouted to Chase Biz Unlimited — switch billing to Biz Gold. ~$632/yr in lost points.' },
+      { icon:'🍽️', title:'Dining & Restaurants', subtitle:'All US dining, takeout, coffee',
+        options:[ {card:'bizGold',rank:1,rate:'4x MR',earn:4,currency:'MR'}, {card:'freedom',rank:2,rate:'5x UR',earn:5,currency:'UR',note:'Q1 only, ends Mar 31'} ],
+        note:'After Mar 31: Biz Gold is the permanent home for all dining.' },
+      { icon:'✈️', title:'Airfare', subtitle:'Flights booked directly with airlines',
+        options:[ {card:'amexPlat',rank:1,rate:'5x MR',earn:5,currency:'MR'}, {card:'csr',rank:2,rate:'3x UR',earn:3,currency:'UR'} ],
+        note:'Book direct with airline (not OTA) to earn 5x on Amex Plat.' },
+      { icon:'🏨', title:'Hotels', subtitle:'Hotel stays',
+        options:[ {card:'amexPlat',rank:1,rate:'5x MR',earn:5,currency:'MR',note:'via Amex Travel'}, {card:'csr',rank:2,rate:'10x UR',earn:10,currency:'UR',note:'via Chase Travel portal'} ],
+        note:'Amex Travel 5x + Fine Hotels benefits often beats Chase portal 10x once you factor in elite perks.' },
+      { icon:'🌐', title:'Travel Portal Bookings', subtitle:'Chase Travel, Amex Travel, C1',
+        options:[ {card:'csr',rank:1,rate:'10x UR',earn:10,currency:'UR',note:'Chase Travel'}, {card:'venturex',rank:2,rate:'5x C1',earn:5,currency:'C1',note:'Capital One Travel'} ],
+        note:'Portal bookings sacrifice hotel elite status. Weigh bonus points vs. benefits.' },
+      { icon:'📦', title:'Shipping / ShipStation', subtitle:'ShipStation labels, UPS, FedEx, USPS',
+        options:[ {card:'inkPreferred',rank:1,rate:'3x UR',earn:3,currency:'UR'} ],
+        note:'ShipStation is the primary spend here. Make sure the Ink Preferred is the card on file.' },
+      { icon:'🏥', title:'Medical & Healthcare', subtitle:'Doctor visits, pharmacy',
+        options:[ {card:'venturex',rank:1,rate:'2x C1',earn:2,currency:'C1'} ],
+        note:'No card has a healthcare bonus. Venture X 2x catch-all wins.' },
+      { icon:'🛍️', title:'Everything Else', subtitle:'Catch-all for uncategorized spend',
+        options:[ {card:'venturex',rank:1,rate:'2x C1',earn:2,currency:'C1'} ],
+        note:'2x on Venture X beats 1.5x on Chase Biz Unlimited for anything without a better card.' },
     ]
   },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
-      tooltip: { callbacks: { label: ctx => {
-        const labels = ['LinkedIn DMs','Partner Meetings','Referral Asks','Intro Calls'];
-        const actuals = [paceTargets['LinkedIn DMs'], paceTargets['Partner Meetings'], paceTargets['Referral Asks'], paceTargets['Intro Calls']];
-        return ` ${labels[ctx.datasetIndex]}: ${actuals[ctx.datasetIndex][ctx.dataIndex]}`;
-      }}}
-    },
-    scales: {
-      x: { ...darkScales.x, stacked: true },
-      y: { ...darkScales.y, stacked: true, ticks: { color: '#64748b', font: { size: 11 } } }
-    }
-  }
-});
-
-// Pace summary cards
-const paceCardData = [
-  { label: 'LinkedIn DMs / week',    target: '35–50',  color: '#60a5fa', note: 'DTC founders, ops leads' },
-  { label: 'Partner meetings / week',target: '1',      color: '#4ade80', note: 'Agencies, consultants, fintechs' },
-  { label: 'Referral asks / week',   target: '2',      color: '#c084fc', note: 'Existing clients + network' },
-  { label: 'Intro calls / week',     target: '3–4',    color: '#fbbf24', note: 'Qualified first conversations' },
+  {
+    label: 'Set & Forget',
+    desc: 'Card already linked — these never change, no decisions needed',
+    color: '#1a8a3c',
+    cats: [
+      { icon:'🚗', title:'Rideshare', subtitle:'Uber (Yan), Lyft (Sonam)',
+        options:[ {card:'amexPlat',rank:1,rate:'$15/mo credit',note:'Uber — credit auto-fires on Yan\'s Amex Plat'}, {card:'csr',rank:2,rate:'$10/mo credit',note:'Lyft — auto-fires on Sonam\'s CSR'} ],
+        note:'Both cards are linked in the apps. Credits fire automatically. Nothing to do.' },
+      { icon:'🛒', title:'Amazon & Whole Foods', subtitle:'Amazon.com, Whole Foods, Fresh',
+        options:[ {card:'amazon',rank:1,rate:'5% back',earn:5,currency:'cash'} ],
+        note:'$10,104 on Amazon in 2025. Correctly routed. Leave it.' },
+      { icon:'📱', title:'Phone & Internet', subtitle:'T-Mobile, Spectrum, cable',
+        options:[ {card:'inkCashSonam',rank:1,rate:'5x UR',earn:5,currency:'UR',note:'Sonam Ink Cash (830)'} ],
+        note:'⚡ T-Mobile currently on Amex Biz Plat — move to Ink Cash (830) before canceling.' },
+      { icon:'🎶', title:'Digital Entertainment', subtitle:'YouTube Premium, NYT, streaming',
+        options:[ {card:'amexPlat',rank:1,rate:'$240 credit',note:'Auto-reimburses ~$25/mo'} ],
+        note:'Fires automatically on Amex Plat. Already set up correctly.' },
+      { icon:'🖥️', title:'Office Supplies', subtitle:'Staples, Office Depot',
+        options:[ {card:'inkCashYan',rank:1,rate:'5x UR',earn:5,currency:'UR',note:'Yan Ink Cash (4093)'} ], note:null },
+      { icon:'🎾', title:'Squarespace', subtitle:'OC annual subscription',
+        options:[ {card:'bizGold',rank:1,rate:'4x MR',earn:4,currency:'MR',note:'+ $150 credit verified ✓'} ],
+        note:'Already on Biz Gold. $150 credit confirmed firing annually.' },
+    ]
+  },
+  {
+    label: 'Low Priority / Reference Only',
+    desc: 'Categories you rarely spend in — just here for completeness',
+    color: '#8e8e93',
+    cats: [
+      { icon:'📣', title:'Online Advertising', subtitle:'Meta, Google, LinkedIn ads',
+        options:[ {card:'inkPreferred',rank:1,rate:'3x UR',earn:3,currency:'UR'} ],
+        note:'Not a meaningful spend category right now. If that changes, Ink Preferred is the card.' },
+    ]
+  },
 ];
-const paceCardsEl = document.getElementById('paceCards');
-paceCardData.forEach(p => {
-  paceCardsEl.innerHTML += `
-    <div style="background:#1e2433;border-left:3px solid ${p.color};border-radius:0 8px 8px 0;padding:10px 14px;">
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:4px;">${p.label}</div>
-      <div style="font-size:22px;font-weight:700;color:${p.color};">${p.target}</div>
-      <div style="font-size:11px;color:#64748b;margin-top:2px;">${p.note}</div>
-    </div>
-  `;
-});
 
+function renderRouting() {
+  const container = document.getElementById('routing-grid');
+  container.innerHTML = '';
+
+  categorySections.forEach((section, si) => {
+    // Section divider
+    const divider = document.createElement('div');
+    divider.style.cssText = 'grid-column: 1 / -1; padding: ' + (si === 0 ? '4px 0 8px' : '12px 0 8px');
+    divider.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="height:2px;flex:1;background:${section.color};opacity:0.15;border-radius:2px;"></div>
+        <div>
+          <span style="font-size:13px;font-weight:700;color:${section.color};">${section.label}</span>
+          <span style="font-size:12px;color:#8e8e93;margin-left:8px;">${section.desc}</span>
+        </div>
+        <div style="height:2px;flex:1;background:${section.color};opacity:0.15;border-radius:2px;"></div>
+      </div>`;
+    container.appendChild(divider);
+
+    section.cats.forEach(cat => {
+      const el = document.createElement('div');
+      el.className = 'category-card';
+      if (section.label === 'Low Priority / Reference Only') el.style.opacity = '0.7';
+      let rowsHtml = '';
+      cat.options.forEach(opt => {
+        const c = CARDS_META[opt.card];
+        const rowClass  = opt.rank === 1 ? 'primary' : opt.rank === 'avoid' ? 'avoid' : 'secondary';
+        const rankHtml  = opt.rank === 1 ? `<div class="rank-badge rank-1">1</div>` : opt.rank === 'avoid' ? `<div class="rank-badge rank-avoid">✕</div>` : `<div class="rank-badge rank-2">2</div>`;
+        const rateColor = opt.rank === 1 ? 'rate-green' : opt.rank === 'avoid' ? 'rate-red' : 'rate-blue';
+        const noteHtml  = opt.note ? `<div class="card-info-note">${opt.note}</div>` : '';
+        const retPct = (opt.earn && opt.currency) ? (opt.earn * CPP[opt.currency]).toFixed(1) : null;
+        const retNum = retPct ? parseFloat(retPct) : 0;
+        const retColor = opt.rank === 'avoid' ? '#d70015' : retNum >= 7 ? '#1a8a3c' : retNum >= 5 ? '#0071e3' : retNum >= 3 ? '#bf5500' : '#8e8e93';
+        const retHtml = retPct ? `<div style="font-size:10px;color:${retColor};font-weight:700;margin-top:1px;">${retPct}% back</div>` : '';
+        rowsHtml += `<div class="card-row ${rowClass}">
+          ${rankHtml}
+          ${mc(c.cls, c.label, c.logo)}
+          <div class="card-info">
+            <div class="card-info-name">${c.fullName}</div>
+            <div class="card-info-owner">${c.owner}</div>
+            ${noteHtml}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div class="rate-badge ${rateColor}">${opt.rate}</div>
+            ${retHtml}
+          </div>
+        </div>`;
+      });
+      el.innerHTML = `
+        <div class="cat-header">
+          <div class="cat-icon">${cat.icon}</div>
+          <div><div class="cat-title">${cat.title}</div><div class="cat-subtitle">${cat.subtitle}</div></div>
+        </div>
+        <div class="card-options">${rowsHtml}</div>
+        ${cat.note ? `<div class="routing-note">${cat.note}</div>` : ''}`;
+      container.appendChild(el);
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
+   TAB 3 — POINTS SUMMARY
+══════════════════════════════════════════ */
+const currencies = [
+  {
+    icon: '✦', iconBg: '#1d1d1f', iconColor: '#e5d5b0',
+    name: 'Chase Ultimate Rewards (UR)', color: '#1a4dbd',
+    balance: '327k', cards: ['Sonam CSR ···3033', 'Sonam Ink Preferred ···726', 'Sonam Ink Cash ···830', 'Yan Ink Cash ···4093', 'Yan CSR ···4094 (downgrade Aug)'],
+    estValue: '~$4,900 at 1.5cpp via CSR portal · ~$6,500+ transferred',
+    partners: [
+      { name: 'Hyatt', ratio: '1:1', value: '~2.0cpp', rec: 'BEST', recClass: '' },
+      { name: 'United MileagePlus', ratio: '1:1', value: '~1.5cpp', rec: 'GREAT', recClass: '' },
+      { name: 'Southwest Rapid Rewards', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'Air Canada Aeroplan', ratio: '1:1', value: '~1.7cpp', rec: 'GREAT', recClass: '' },
+      { name: 'British Airways Avios', ratio: '1:1', value: '~1.5cpp (short-haul)', rec: null, recClass: '' },
+      { name: 'Singapore KrisFlyer', ratio: '1:1', value: '~1.8cpp (biz)', rec: null, recClass: '' },
+    ],
+    note: '327k = Sonam CSR balance. Yan CSR points migrate to Sonam CSR after downgrade — keep both under same household to pool. Transfer to Hyatt is the standout sweet spot (Park Hyatts, Andaz, etc.).',
+  },
+  {
+    icon: 'AMEX', iconBg: '#1a6bb5', iconColor: 'white',
+    name: 'Amex Membership Rewards (MR)', color: '#1a6bb5',
+    balance: '606k', cards: ['Yan Amex Plat ···82006 (192k)', 'Sonam Biz Gold ···51007 (414k, incl. Biz Plat balance)'],
+    estValue: '~$7,900 at 1.3cpp via Amex Travel · ~$12k+ transferred',
+    partners: [
+      { name: 'Air Canada Aeroplan', ratio: '1:1', value: '~1.7cpp', rec: 'BEST', recClass: '' },
+      { name: 'ANA Mileage Club', ratio: '1:1', value: '~2.0cpp (biz/first)', rec: 'BEST', recClass: '' },
+      { name: 'British Airways Avios', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'Delta SkyMiles', ratio: '1:1', value: '~1.1cpp (variable)', rec: null, recClass: '' },
+      { name: 'Air France/KLM Flying Blue', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'Singapore KrisFlyer', ratio: '1:1', value: '~1.8cpp (biz)', rec: null, recClass: '' },
+      { name: 'Marriott Bonvoy', ratio: '1:0.8', value: '~0.8cpp', rec: null, recClass: '' },
+      { name: 'Hilton Honors', ratio: '1:2', value: '~0.6cpp', rec: null, recClass: '' },
+    ],
+    note: 'Cancel Biz Plat first — MR balance transfers to Yan\'s Amex Plat automatically (same account holder). Don\'t cancel the Plat while you have a large MR balance you haven\'t deployed.',
+  },
+  {
+    icon: 'C1', iconBg: '#c8102e', iconColor: 'white',
+    name: 'Capital One Miles', color: '#c8102e',
+    balance: '143k', cards: ['Sonam Venture X ···7484'],
+    estValue: '~$1,430 at 1cpp via C1 Travel · ~$2,100+ transferred',
+    partners: [
+      { name: 'Air Canada Aeroplan', ratio: '1:1', value: '~1.7cpp', rec: 'BEST', recClass: '' },
+      { name: 'Turkish Miles&Smiles', ratio: '1:1', value: '~2.0cpp (Star Alliance)', rec: 'BEST', recClass: '' },
+      { name: 'Avianca LifeMiles', ratio: '1:1', value: '~1.7cpp', rec: null, recClass: '' },
+      { name: 'Air France/KLM Flying Blue', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'British Airways Avios', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'Wyndham Rewards', ratio: '1:1', value: '~1.1cpp', rec: null, recClass: '' },
+    ],
+    note: 'C1 miles have improved significantly. Turkish and Avianca are underutilized sweet spots for Star Alliance redemptions (United/Lufthansa seats).',
+  },
+  {
+    icon: 'B', iconBg: '#1a1a1a', iconColor: 'white',
+    name: 'BILT Points', color: '#3a3a3c',
+    balance: '72k', cards: ['BILT Rewards ···6200'],
+    estValue: '~$1,440 transferred to Hyatt (~2cpp)',
+    partners: [
+      { name: 'World of Hyatt', ratio: '1:1', value: '~2.0cpp', rec: 'BEST', recClass: '' },
+      { name: 'United MileagePlus', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'American Airlines AAdvantage', ratio: '1:1', value: '~1.5cpp', rec: null, recClass: '' },
+      { name: 'Air Canada Aeroplan', ratio: '1:1', value: '~1.7cpp', rec: null, recClass: '' },
+      { name: 'IHG One Rewards', ratio: '1:1', value: '~0.7cpp', rec: null, recClass: '' },
+    ],
+    note: 'Transfer to Hyatt is the obvious move — 72k Hyatt points = 2-4 nights at a Park Hyatt or Andaz depending on property. Do this before the balance sits idle.',
+  },
+];
+
+function renderPoints() {
+  const grid = document.getElementById('points-grid');
+  currencies.forEach(cur => {
+    const el = document.createElement('div');
+    el.className = 'currency-card';
+
+    const partnersHtml = cur.partners.map(p => `
+      <div class="partner-row">
+        <div class="partner-name">${p.name}</div>
+        <div class="partner-ratio" style="margin-right:8px;">${p.ratio}</div>
+        <div class="partner-value" style="color:${cur.color};margin-right:${p.rec ? '6px' : '0'}">${p.value}</div>
+        ${p.rec ? `<span class="partner-rec ${p.recClass}">${p.rec}</span>` : ''}
+      </div>`).join('');
+
+    const cardsHtml = cur.cards.map(c => `<div style="font-size:12px;color:#6e6e73;margin-top:2px;">· ${c}</div>`).join('');
+
+    el.innerHTML = `
+      <div class="currency-header">
+        <div class="currency-icon" style="background:${cur.iconBg};color:${cur.iconColor};font-size:${cur.icon.length > 1 ? '9px' : '18px'};font-weight:800;">${cur.icon}</div>
+        <div>
+          <div class="currency-name">${cur.name}</div>
+          <div class="currency-balance" style="color:${cur.color}">${cur.balance} pts</div>
+          <div class="currency-value">${cur.estValue}</div>
+        </div>
+      </div>
+      <div style="padding:10px 20px 4px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6e6e73;margin-bottom:6px;">Earning cards</div>
+        ${cardsHtml}
+      </div>
+      <div class="points-section-label" style="margin-top:8px;">Transfer Partners</div>
+      <div class="partners-list">${partnersHtml}</div>
+      <div class="points-note">${cur.note}</div>`;
+    grid.appendChild(el);
+  });
+}
+
+/* ══════════════════════════════════════════
+   TAB 4 — RETURN ON SPEND
+   cpp = cents per point (conservative transfer value)
+   return = earn rate × cpp / 100
+══════════════════════════════════════════ */
+
+// Point valuations used (conservative transfer partner blend, not portal)
+// MR: 1.8cpp (Air Canada/ANA sweet spots blended with everyday use)
+// UR: 1.7cpp (Hyatt/Aeroplan blend)
+// C1: 1.6cpp (Turkish/Avianca blend)
+// Cash back: 1.0cpp by definition
+
+const CPP = { MR: 1.8, UR: 1.7, C1: 1.6, cash: 1.0 };
+
+function returnPct(earn, currency) {
+  return (earn * CPP[currency]).toFixed(1);
+}
+
+const rosData = [
+  {
+    section: 'Amex Membership Rewards (MR)',
+    color: '#1a6bb5',
+    cpp: CPP.MR,
+    note: `Valued at ${CPP.MR}¢/pt — conservative blend of Air Canada Aeroplan (~1.7cpp) and ANA sweet spots (~2.0cpp). Avoid portal redemptions at 1.0cpp.`,
+    rows: [
+      { card: 'Amex Platinum', owner: 'Yan', category: 'Airfare (direct)',         earn: 5,   currency: 'MR', cls: 'mc-amex-plat', label: 'Plat',     logo: 'AMEX' },
+      { card: 'Amex Platinum', owner: 'Yan', category: 'Hotels (via Amex Travel)', earn: 5,   currency: 'MR', cls: 'mc-amex-plat', label: 'Plat',     logo: 'AMEX' },
+      { card: 'Amex Biz Gold',  owner: 'Sonam', category: 'Software & SaaS',       earn: 4,   currency: 'MR', cls: 'mc-biz-gold',  label: 'Biz Gold', logo: 'AMEX' },
+      { card: 'Amex Biz Gold',  owner: 'Sonam', category: 'Dining',                earn: 4,   currency: 'MR', cls: 'mc-biz-gold',  label: 'Biz Gold', logo: 'AMEX' },
+      { card: 'Amex Platinum', owner: 'Yan', category: 'Everything else',          earn: 1,   currency: 'MR', cls: 'mc-amex-plat', label: 'Plat',     logo: 'AMEX' },
+    ]
+  },
+  {
+    section: 'Chase Ultimate Rewards (UR)',
+    color: '#1a4dbd',
+    cpp: CPP.UR,
+    note: `Valued at ${CPP.UR}¢/pt — Hyatt transfer (~2.0cpp) anchors the high end; weighted down for categories where you'd use United or portal. Don't redeem below 1.5cpp.`,
+    rows: [
+      { card: 'Chase Sapphire Reserve', owner: 'Sonam', category: 'Hotels (via Chase Travel)', earn: 10,  currency: 'UR', cls: 'mc-csr',     label: 'Reserve',  logo: '✦' },
+      { card: 'Chase Sapphire Reserve', owner: 'Sonam', category: 'Travel (via Chase Travel)', earn: 5,   currency: 'UR', cls: 'mc-csr',     label: 'Reserve',  logo: '✦' },
+      { card: 'Chase Sapphire Reserve', owner: 'Sonam', category: 'Dining',                    earn: 3,   currency: 'UR', cls: 'mc-csr',     label: 'Reserve',  logo: '✦' },
+      { card: 'Chase Freedom Flex',     owner: 'Sonam', category: 'Dining (Q1 2026 only)',     earn: 5,   currency: 'UR', cls: 'mc-freedom',  label: 'Freedom',  logo: '✦', highlight: 'Ends Mar 31' },
+      { card: 'Chase Ink Preferred',    owner: 'Sonam', category: 'Shipping / ShipStation',    earn: 3,   currency: 'UR', cls: 'mc-ink',      label: 'Ink Pref', logo: '✦' },
+      { card: 'Chase Ink Preferred',    owner: 'Sonam', category: 'Advertising',               earn: 3,   currency: 'UR', cls: 'mc-ink',      label: 'Ink Pref', logo: '✦' },
+      { card: 'Chase Ink Biz Cash',     owner: 'Both',  category: 'Phone / Internet',          earn: 5,   currency: 'UR', cls: 'mc-ink',      label: 'Ink Cash', logo: '✦' },
+      { card: 'Chase Ink Biz Cash',     owner: 'Yan',   category: 'Office Supplies',           earn: 5,   currency: 'UR', cls: 'mc-ink',      label: 'Ink Cash', logo: '✦' },
+      { card: 'Chase Ink Biz Unlimited',owner: 'Yan',   category: 'Everything else',           earn: 1.5, currency: 'UR', cls: 'mc-ink',      label: 'Biz Unltd',logo: '✦', avoid: true },
+    ]
+  },
+  {
+    section: 'Capital One Miles (C1)',
+    color: '#c8102e',
+    cpp: CPP.C1,
+    note: `Valued at ${CPP.C1}¢/pt — Turkish Miles&Smiles and Avianca LifeMiles are the sweet spots for Star Alliance redemptions. C1 portal gives 1.0cpp, which is a waste.`,
+    rows: [
+      { card: 'Cap One Venture X', owner: 'Sonam', category: 'Hotels (via C1 Travel)', earn: 10, currency: 'C1', cls: 'mc-venturex', label: 'Venture X', logo: 'C1' },
+      { card: 'Cap One Venture X', owner: 'Sonam', category: 'Flights (via C1 Travel)',earn: 5,  currency: 'C1', cls: 'mc-venturex', label: 'Venture X', logo: 'C1' },
+      { card: 'Cap One Venture X', owner: 'Sonam', category: 'Everything else',        earn: 2,  currency: 'C1', cls: 'mc-venturex', label: 'Venture X', logo: 'C1' },
+    ]
+  },
+  {
+    section: 'Cash Back (flat value)',
+    color: '#3a3a3c',
+    cpp: CPP.cash,
+    note: 'Cash back is worth exactly what it says — no transfer upside, but no complexity either. The Amazon card is legitimately hard to beat for Amazon spend.',
+    rows: [
+      { card: 'Amazon Visa', owner: 'Yan', category: 'Amazon & Whole Foods', earn: 5, currency: 'cash', cls: 'mc-amazon', label: 'Amazon', logo: '▶' },
+    ]
+  },
+];
+
+function renderValue() {
+  const container = document.getElementById('value-grid');
+  container.innerHTML = '';
+
+  rosData.forEach(section => {
+    // Section header
+    const header = document.createElement('div');
+    header.style.cssText = 'margin-bottom:10px;margin-top:20px;display:flex;align-items:baseline;gap:10px;';
+    header.innerHTML = `
+      <span style="font-size:14px;font-weight:700;color:${section.color};">${section.section}</span>
+      <span style="font-size:12px;color:#8e8e93;">valued at ${section.cpp}¢/pt</span>`;
+    container.appendChild(header);
+
+    // Table
+    const table = document.createElement('div');
+    table.style.cssText = 'background:white;border-radius:14px;border:1px solid #e5e5e7;overflow:hidden;margin-bottom:8px;';
+
+    // Column headers
+    table.innerHTML = `<div style="display:grid;grid-template-columns:50px 1fr 1fr 90px 90px 90px;padding:8px 16px;background:#f9f9fb;border-bottom:1px solid #e5e5e7;gap:8px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;"></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;">Card</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;">Category</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;text-align:right;">Earn Rate</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;text-align:right;">Value/pt</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8e8e93;text-align:right;">Return on $</div>
+    </div>`;
+
+    section.rows.forEach((row, i) => {
+      const ret = returnPct(row.earn, row.currency);
+      const retNum = parseFloat(ret);
+      const retColor = retNum >= 7 ? '#1a8a3c' : retNum >= 5 ? '#0071e3' : retNum >= 3 ? '#bf5500' : '#8e8e93';
+      const barWidth = Math.min(100, retNum / 12 * 100);
+      const isAvoid = row.avoid;
+      const bg = i % 2 === 0 ? 'white' : '#fafafa';
+
+      const rowEl = document.createElement('div');
+      rowEl.style.cssText = `display:grid;grid-template-columns:50px 1fr 1fr 90px 90px 90px;padding:10px 16px;gap:8px;align-items:center;background:${isAvoid ? '#fff8f8' : bg};border-bottom:1px solid #f5f5f7;${isAvoid ? 'opacity:0.6;' : ''}`;
+      rowEl.innerHTML = `
+        <div>${mc(row.cls, row.label, row.logo)}</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:${isAvoid ? '#d70015' : '#1d1d1f'};">${row.card}${isAvoid ? ' ✕' : ''}</div>
+          <div style="font-size:11px;color:#8e8e93;">${row.owner}</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#1d1d1f;">${row.category}</div>
+          ${row.highlight ? `<div style="font-size:10px;background:#fff3cd;color:#856404;padding:1px 6px;border-radius:4px;display:inline-block;margin-top:2px;font-weight:600;">${row.highlight}</div>` : ''}
+        </div>
+        <div style="text-align:right;font-size:13px;font-weight:700;color:${isAvoid ? '#8e8e93' : section.color};">${row.earn}x ${row.currency}</div>
+        <div style="text-align:right;font-size:12px;color:#6e6e73;">${section.cpp}¢</div>
+        <div style="text-align:right;">
+          <div style="font-size:15px;font-weight:800;color:${isAvoid ? '#8e8e93' : retColor};">${ret}%</div>
+          <div style="height:4px;background:#f0f0f5;border-radius:2px;margin-top:3px;overflow:hidden;">
+            <div style="height:100%;width:${barWidth}%;background:${isAvoid ? '#d2d2d7' : retColor};border-radius:2px;transition:width 0.3s;"></div>
+          </div>
+        </div>`;
+      table.appendChild(rowEl);
+    });
+
+    // Section note
+    const noteEl = document.createElement('div');
+    noteEl.style.cssText = 'padding:10px 16px;background:#fafafa;border-top:1px solid #f0f0f5;font-size:11px;color:#6e6e73;line-height:1.5;';
+    noteEl.textContent = section.note;
+    table.appendChild(noteEl);
+    container.appendChild(table);
+  });
+}
+
+/* ─── Init ─── */
+renderPerks();
+renderRouting();
+renderPoints();
+renderValue();
 </script>
 </body>
 </html>
