@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy & Eggs · Attendees</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a1a; }
+  .header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 20px 28px; }
+  .header h1 { font-size: 18px; font-weight: 700; color: #111; }
+  .header p { font-size: 13px; color: #6b7280; margin-top: 3px; }
+  .controls { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 14px 28px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .controls input { border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 11px; font-size: 13px; width: 200px; outline: none; }
+  .controls input:focus { border-color: #6366f1; }
+  .controls select { border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 11px; font-size: 13px; background: #fff; cursor: pointer; outline: none; }
+  .controls select:focus { border-color: #6366f1; }
+  .row-count { font-size: 13px; color: #6b7280; margin-left: auto; }
+  .batch-bar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 28px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .batch-bar span { font-size: 12px; color: #9ca3af; margin-right: 4px; }
+  .batch-btn { font-size: 12px; font-weight: 600; background: #f0f0ff; color: #4f46e5; border: 1px solid #c7d2fe; border-radius: 5px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+  .batch-btn:hover { background: #e0e7ff; }
+  .popup-tip { font-size: 11px; color: #9ca3af; margin-left: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f9fafb; border-bottom: 2px solid #e5e7eb; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; color: #374151; cursor: pointer; user-select: none; white-space: nowrap; }
+  thead th:hover { background: #f1f5f9; }
+  thead th .sort-icon { display: inline-block; margin-left: 4px; color: #9ca3af; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
+  tbody tr:hover { background: #fafbff; }
+  tbody td { padding: 9px 14px; vertical-align: middle; }
+  .batch-divider td { background: #f4f4f8; font-size: 11px; font-weight: 600; color: #9ca3af; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 14px; }
+  .li-icon { display: inline-flex; align-items: center; }
+  .li-icon a { display: inline-flex; }
+  .li-icon svg { display: block; }
+  .li-dim { opacity: 0.15; }
+  .name { font-weight: 600; color: #111; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 99px; padding: 2px 9px; white-space: nowrap; }
+  /* Event badge */
+  .ev-energy { background: #fef3c7; color: #92400e; }
+  /* Status badges */
+  .st-confirmed { background: #d1fae5; color: #065f46; }
+  .st-guessed   { background: #fef9c3; color: #854d0e; }
+  .st-na        { background: #f3f4f6; color: #6b7280; }
+  /* Type badges */
+  .tp-vc        { background: #ede9fe; color: #5b21b6; }
+  .tp-lp        { background: #dbeafe; color: #1e40af; }
+  .tp-impact    { background: #d1fae5; color: #065f46; }
+  .tp-investor  { background: #e0f2fe; color: #075985; }
+  .tp-policy    { background: #fce7f3; color: #9d174d; }
+  .tp-academic  { background: #fef3c7; color: #92400e; }
+  .tp-consultant{ background: #f0fdf4; color: #166534; }
+  .tp-founder   { background: #fff7ed; color: #9a3412; }
+  .tp-operator  { background: #f0f9ff; color: #0c4a6e; }
+  .tp-unknown   { background: #f3f4f6; color: #6b7280; }
+  .table-wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ Energy & Eggs — Attendees</h1>
+  <p>Wednesday, March 18 · St Jardim, New York · 47 registered · <span id="luma-link"><a href="https://luma.com/o0m086nm" target="_blank" style="color:#6366f1;text-decoration:none;">View on Luma ↗</a></span></p>
+</div>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="Search name…" oninput="render()">
+  <select id="filterType" onchange="render()">
+    <option value="">All types</option>
+    <option value="VC">VC</option>
+    <option value="LP">LP</option>
+    <option value="Impact Investor">Impact Investor</option>
+    <option value="Investor">Investor</option>
+    <option value="Founder/Operator">Founder/Operator</option>
+    <option value="Policy/NGO">Policy/NGO</option>
+    <option value="Consultant/Advisor">Consultant/Advisor</option>
+    <option value="Unknown">Unknown</option>
+  </select>
+  <select id="filterStatus" onchange="render()">
+    <option value="">All statuses</option>
+    <option value="Confirmed">Confirmed</option>
+    <option value="Guessed">Guessed</option>
+    <option value="N/A">No URL</option>
+  </select>
+  <div class="row-count" id="rowCount"></div>
+</div>
+
+<div class="batch-bar" id="batchBar">
+  <span>Open LinkedIn:</span>
+</div>
+
+<div class="table-wrap">
+<table id="mainTable">
+  <thead>
+    <tr>
+      <th style="width:36px" onclick="sortBy('li')">LI <span class="sort-icon" id="si-li"></span></th>
+      <th onclick="sortBy('name')">Name <span class="sort-icon" id="si-name"></span></th>
+      <th onclick="sortBy('event')">Event <span class="sort-icon" id="si-event"></span></th>
+      <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status"></span></th>
+      <th onclick="sortBy('type')">Type <span class="sort-icon" id="si-type"></span></th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<script>
+// [photo_url_or_null, name, event, linkedin_url, status, type]
+const DATA = [
+  [null, "Sonam Velani",                        "Energy & Eggs", "https://linkedin.com/in/sonamvelani",              "Confirmed", "VC"],
+  [null, "Alex Gheorghe",                        "Energy & Eggs", "https://linkedin.com/in/gheorghealexandra",        "Confirmed", "VC"],
+  [null, "Allison Hinckley",                     "Energy & Eggs", "https://linkedin.com/in/allison-hinckley",         "Confirmed", "VC"],
+  [null, "Andrew Jaffoni",                       "Energy & Eggs", "https://linkedin.com/in/ajaffoni",                 "Confirmed", "VC"],
+  [null, "Annie McCluskey",                      "Energy & Eggs", "https://linkedin.com/in/anniemccluskey",           "Confirmed", "VC"],
+  [null, "Aram Ouligian",                        "Energy & Eggs", "https://linkedin.com/in/aram-ouligian-506b06116",  "Confirmed", "VC"],
+  [null, "Asher Goldman",                        "Energy & Eggs", "https://linkedin.com/in/asher-goldman-34085169",   "Confirmed", "Investor"],
+  [null, "Ben Birnbaum (Keyframe)",              "Energy & Eggs", "https://linkedin.com/in/benjaminbirnbaum",         "Confirmed", "VC"],
+  [null, "Ben Carron",                           "Energy & Eggs", "https://linkedin.com/in/Bencarron",                "Confirmed", "Investor"],
+  [null, "Bennett Cohen",                        "Energy & Eggs", "https://linkedin.com/in/bennettrosscohen",         "Confirmed", "VC"],
+  [null, "Ben Wolkon",                           "Energy & Eggs", "https://linkedin.com/in/benjamin-wolkon-93102a48", "Confirmed", "Investor"],
+  [null, "Brandon Blaesser",                     "Energy & Eggs", "https://linkedin.com/in/bblaesser",                "Confirmed", "VC"],
+  [null, "Brendan Hermalyn",                     "Energy & Eggs", "https://linkedin.com/in/bhermalyn",                "Confirmed", "VC"],
+  [null, "Cameron Carver",                       "Energy & Eggs", "https://linkedin.com/in/cameron-carver123",        "Confirmed", "VC"],
+  [null, "Caroline Noble",                       "Energy & Eggs", "https://linkedin.com/in/carolinejnoble",           "Confirmed", "VC"],
+  [null, "Cassia Attard",                        "Energy & Eggs", "https://linkedin.com/in/cassia-attard",            "Confirmed", "Impact Investor"],
+  [null, "Catherine Chien",                      "Energy & Eggs", "https://linkedin.com/in/catherinechien",           "Confirmed", "VC"],
+  [null, "Cordelia Peters",                      "Energy & Eggs", "https://linkedin.com/in/cordelia-peters",          "Confirmed", "VC"],
+  [null, "Deepika Jonnalagadda, Outlander VC",   "Energy & Eggs", "https://linkedin.com/in/deepikajonnalagadda",      "Confirmed", "VC"],
+  [null, "Enki Toto",                            "Energy & Eggs", "https://linkedin.com/in/enkitoto",                 "Confirmed", "Founder/Operator"],
+  [null, "Ethan Sohn",                           "Energy & Eggs", "https://linkedin.com/in/ethansohn",                "Confirmed", "VC"],
+  [null, "Everett Sanderson",                    "Energy & Eggs", "https://linkedin.com/in/everettsanderson",         "Confirmed", "VC"],
+  [null, "Findlay Parke",                        "Energy & Eggs", "https://linkedin.com/in/findlayparke",             "Guessed",   "VC"],
+  [null, "howard yu",                            "Energy & Eggs", "https://linkedin.com/in/howardgyu",                "Guessed",   "VC"],
+  [null, "Jay Kapoor",                           "Energy & Eggs", "https://linkedin.com/in/jaykapoor",                "Confirmed", "VC"],
+  [null, "Jonathan Malawer",                     "Energy & Eggs", "https://linkedin.com/in/jonathan-malawer",         "Confirmed", "Investor"],
+  [null, "Jon Guerster",                         "Energy & Eggs", "https://linkedin.com/in/jon-guerster",             "Confirmed", "VC"],
+  [null, "Josh Kaufman",                         "Energy & Eggs", "https://linkedin.com/in/joshua-kaufman-khasma",    "Confirmed", "Founder/Operator"],
+  [null, "jr@keyframecapital.com",               "Energy & Eggs", "",                                                  "N/A",       "VC"],
+  [null, "Kevin Webb",                           "Energy & Eggs", "https://linkedin.com/in/webbkevin",                "Confirmed", "VC"],
+  [null, "Kim Zou",                              "Energy & Eggs", "https://linkedin.com/in/kim-zou",                  "Confirmed", "VC"],
+  [null, "Lisa Hansmann",                        "Energy & Eggs", "https://linkedin.com/in/lisa-hansmann-88803171",   "Confirmed", "Impact Investor"],
+  [null, "Mairi Robertson",                      "Energy & Eggs", "https://linkedin.com/in/mairi-robertson-b8716345", "Confirmed", "VC"],
+  [null, "Malcolm McClain",                      "Energy & Eggs", "https://linkedin.com/in/malcolm-mcclain-834a1b31", "Confirmed", "Investor"],
+  [null, "Matt Severson",                        "Energy & Eggs", "https://linkedin.com/in/matts3v3rson",             "Confirmed", "VC"],
+  [null, "Micah Kotch",                          "Energy & Eggs", "https://linkedin.com/in/micahjason",               "Confirmed", "Policy/NGO"],
+  [null, "Michael Rhys",                         "Energy & Eggs", "https://linkedin.com/in/michael-rhys",             "Confirmed", "Founder/Operator"],
+  [null, "Mike Gray",                            "Energy & Eggs", "https://linkedin.com/in/michaelgray6",             "Confirmed", "Investor"],
+  [null, "Omar Smith",                           "Energy & Eggs", "https://linkedin.com/in/smithomar",                "Confirmed", "Investor"],
+  [null, "Priyanka Duvvuru",                     "Energy & Eggs", "https://linkedin.com/in/priyankaduv",              "Confirmed", "VC"],
+  [null, "Renee Beaumont",                       "Energy & Eggs", "https://linkedin.com/in/ren%C3%A9e-beaumont-1294131", "Guessed", "Impact Investor"],
+  [null, "Sarah Sclarsic",                       "Energy & Eggs", "https://linkedin.com/in/sarah-sclarsic",           "Confirmed", "VC"],
+  [null, "Tal Chalozin",                         "Energy & Eggs", "https://linkedin.com/in/talchalozin",              "Confirmed", "Founder/Operator"],
+  [null, "Thomas Belazis",                       "Energy & Eggs", "https://linkedin.com/in/thomasbelazis",            "Confirmed", "VC"],
+  [null, "Tom O'Keefe",                          "Energy & Eggs", "https://linkedin.com/in/tom-o-keefe-2763a936",     "Confirmed", "Impact Investor"],
+  [null, "Yi Jean Chow",                         "Energy & Eggs", "https://linkedin.com/in/yijeanchow",               "Confirmed", "VC"],
+  [null, "Zack Washer",                          "Energy & Eggs", "https://linkedin.com/in/zackwasher",               "Confirmed", "VC"],
+];
+
+const TYPE_ORDER  = ["VC","LP","Impact Investor","Investor","Founder/Operator","Policy/NGO","Consultant/Advisor","Unknown"];
+const STATUS_ORDER = ["Confirmed","Guessed","N/A"];
+
+const TYPE_CLASS = {
+  "VC":               "tp-vc",
+  "LP":               "tp-lp",
+  "Impact Investor":  "tp-impact",
+  "Investor":         "tp-investor",
+  "Policy/NGO":       "tp-policy",
+  "Academic/Research":"tp-academic",
+  "Consultant/Advisor":"tp-consultant",
+  "Founder/Operator": "tp-founder",
+  "Unknown":          "tp-unknown",
+};
+
+const LI_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`;
+
+let sortKey = 'type';
+let sortDir = 1;
+
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const ft = document.getElementById('filterType').value;
+  const fs = document.getElementById('filterStatus').value;
+  return DATA.filter(r => {
+    const name = r[1].toLowerCase();
+    if (q && !name.includes(q)) return false;
+    if (ft && r[5] !== ft) return false;
+    if (fs && r[4] !== fs) return false;
+    return true;
+  });
+}
+
+function sortData(rows) {
+  const keyIdx = { li: 3, name: 1, event: 2, status: 4, type: 5 };
+  const idx = keyIdx[sortKey] ?? 1;
+  return [...rows].sort((a, b) => {
+    let va = a[idx] ?? '', vb = b[idx] ?? '';
+    if (sortKey === 'type') {
+      va = TYPE_ORDER.indexOf(a[5]); vb = TYPE_ORDER.indexOf(b[5]);
+      if (va === vb) {
+        const sa = STATUS_ORDER.indexOf(a[4]), sb = STATUS_ORDER.indexOf(b[4]);
+        if (sa !== sb) return (sa - sb) * sortDir;
+        return a[1].localeCompare(b[1]) * sortDir;
+      }
+      return (va - vb) * sortDir;
+    }
+    if (sortKey === 'status') {
+      va = STATUS_ORDER.indexOf(a[4]); vb = STATUS_ORDER.indexOf(b[4]);
+      if (va === vb) return a[1].localeCompare(b[1]) * sortDir;
+      return (va - vb) * sortDir;
+    }
+    return va.toString().localeCompare(vb.toString()) * sortDir;
+  });
+}
+
+function render() {
+  const filtered = sortData(getFiltered());
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  document.getElementById('rowCount').textContent = `${filtered.length} of ${DATA.length}`;
+
+  // Build batch buttons
+  const batchBar = document.getElementById('batchBar');
+  batchBar.innerHTML = '<span>Open LinkedIn:</span>';
+  const BATCH = 10;
+  const batches = [];
+  for (let i = 0; i < filtered.length; i += BATCH) {
+    const chunk = filtered.slice(i, i + BATCH);
+    const urls = chunk.map(r => r[3]).filter(u => u);
+    const batchNum = Math.floor(i / BATCH) + 1;
+    batches.push({ batchNum, urls, start: i, end: Math.min(i + BATCH - 1, filtered.length - 1) });
+    if (urls.length === 0) continue;
+    const btn = document.createElement('button');
+    btn.className = 'batch-btn';
+    btn.textContent = `Batch ${batchNum} (${urls.length} LI)`;
+    btn.onclick = (function(u) { return function() { u.forEach(url => window.open(url, '_blank')); }; })(urls);
+    batchBar.appendChild(btn);
+  }
+  const tip = document.createElement('span');
+  tip.className = 'popup-tip';
+  tip.textContent = 'Allow popups when prompted';
+  batchBar.appendChild(tip);
+
+  // Build rows
+  filtered.forEach((row, i) => {
+    const batchIdx = Math.floor(i / BATCH);
+    if (i % BATCH === 0 && filtered.length > BATCH) {
+      const divRow = document.createElement('tr');
+      divRow.className = 'batch-divider';
+      divRow.innerHTML = `<td colspan="5">Batch ${batchIdx + 1} · rows ${i + 1}–${Math.min(i + BATCH, filtered.length)}</td>`;
+      tbody.appendChild(divRow);
+    }
+
+    const [photo, name, event, li, status, type] = row;
+    const tr = document.createElement('tr');
+
+    // LI cell
+    const liCell = document.createElement('td');
+    liCell.innerHTML = li
+      ? `<div class="li-icon"><a href="${li}" target="_blank" rel="noopener">${LI_SVG}</a></div>`
+      : `<div class="li-icon li-dim">${LI_SVG}</div>`;
+    tr.appendChild(liCell);
+
+    // Name
+    const nameCell = document.createElement('td');
+    nameCell.innerHTML = `<span class="name">${name}</span>`;
+    tr.appendChild(nameCell);
+
+    // Event
+    const evCell = document.createElement('td');
+    evCell.innerHTML = `<span class="badge ev-energy">${event}</span>`;
+    tr.appendChild(evCell);
+
+    // Status
+    const stClass = status === 'Confirmed' ? 'st-confirmed' : status === 'Guessed' ? 'st-guessed' : 'st-na';
+    const stCell = document.createElement('td');
+    stCell.innerHTML = `<span class="badge ${stClass}">${status}</span>`;
+    tr.appendChild(stCell);
+
+    // Type
+    const tpClass = TYPE_CLASS[type] || 'tp-unknown';
+    const tpCell = document.createElement('td');
+    tpCell.innerHTML = `<span class="badge ${tpClass}">${type}</span>`;
+    tr.appendChild(tpCell);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function sortBy(key) {
+  if (sortKey === key) { sortDir *= -1; }
+  else { sortKey = key; sortDir = 1; }
+  // Update sort icons
+  ['li','name','event','status','type'].forEach(k => {
+    const el = document.getElementById('si-' + k);
+    if (el) el.textContent = k === sortKey ? (sortDir === 1 ? '↑' : '↓') : '';
+  });
+  render();
+}
+
+// Initial render
+sortBy('type');
+</script>
+</body>
+</html>
